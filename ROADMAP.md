@@ -4,9 +4,16 @@
 
 ## Architecture Decisions
 
+- **Architectural Pattern: Clean Architecture + MVVM**
+  - **Shared KMP Core (`sharedLogic`) — Clean Architecture**:
+    - **Domain Layer**: Contains enterprise business rules, Domain Models, Repository Contracts, and Use Cases / Interactors. Pure Kotlin with zero framework dependencies.
+    - **Data Layer**: Contains Repository Implementations, Data Sources (Remote Ktor, Local Room DB, Memory/Cache), DTOs, and Mappers.
+    - **Core Layer**: Contains cross-cutting concerns (`AppResult`/`AppError`, `DispatcherProvider`, `AppLogger`, base utilities).
+    - **DI Layer**: Koin modules configuring and injecting all layers.
+  - **Platform Presentation — MVVM**:
+    - **Android UI**: Native Jetpack Compose + AndroidX ViewModels consuming Use Cases/Repositories via `StateFlow`/`SharedFlow`.
+    - **iOS UI**: Native SwiftUI + Observable ViewModels / Swift Concurrency bridging Shared KMP `StateFlow`/Use Cases.
 - **Kotlin Multiplatform shares only core/domain/data/business logic.**
-- **Android UI is native Jetpack Compose.**
-- **iOS UI is native SwiftUI.**
 - **UI is NOT shared, and Compose Multiplatform must NOT be used for shared UI.**
 - **Shared stack includes:**
   - Kotlin Coroutines & Flow/StateFlow
@@ -22,7 +29,7 @@
 
 ## Progress Summary
 
-- [ ] Phase 1 — Project Foundation & KMP Module Architecture
+- [x] Phase 1 — Project Foundation & KMP Module Architecture
 - [ ] Phase 2 — Shared Domain Models & Contracts
 - [ ] Phase 3 — Networking Foundation
 - [ ] Phase 4 — StorySource Architecture
@@ -55,17 +62,17 @@
 **Prerequisites:** Kotlin Multiplatform project template.
 
 **Tasks**
-- [ ] Audit the generated KMP project and remove/avoid shared Compose UI assumptions.
-- [ ] Establish shared/domain, shared/data, shared/core or equivalent maintainable module/package structure.
-- [ ] Ensure Android app depends on shared KMP and owns Compose UI/navigation/ViewModels as appropriate.
-- [ ] Integrate shared KMP into iOS app/framework and expose to SwiftUI.
-- [ ] Configure Koin, coroutines, serialization, logging, build variants/config.
-- [ ] Add baseline unit tests and platform build verification.
+- [x] Audit the generated KMP project and remove/avoid shared Compose UI assumptions.
+- [x] Establish shared/domain, shared/data, shared/core or equivalent maintainable module/package structure.
+- [x] Ensure Android app depends on shared KMP and owns Compose UI/navigation/ViewModels as appropriate.
+- [x] Integrate shared KMP into iOS app/framework and expose to SwiftUI.
+- [x] Configure Koin, coroutines, serialization, logging, build variants/config.
+- [x] Add baseline unit tests and platform build verification.
 
 **Definition of Done**
-- [ ] No Compose Multiplatform or shared UI code remains.
-- [ ] Android and iOS apps compile and run with shared KMP logic accessible.
-- [ ] Baseline tests pass on both platforms.
+- [x] No Compose Multiplatform or shared UI code remains.
+- [x] Android and iOS apps compile and run with shared KMP logic accessible.
+- [x] Baseline tests pass on both platforms.
 
 ---
 
@@ -531,6 +538,7 @@
 
 | Decision                                   | Status         | Reason                                                                                   |
 |---------------------------------------------|----------------|------------------------------------------------------------------------------------------|
+| Clean Architecture + MVVM                   | Accepted       | Strict separation of concerns (Core/Domain/Data in KMP) with reactive native ViewModels  |
 | Native UI split (Compose for Android, SwiftUI for iOS) | Accepted      | Native look/feel, maintainability, avoid Compose Multiplatform instability                |
 | StorySource abstraction                     | Accepted       | Enables extensibility for remote, local, and AI sources                                  |
 | Room KMP for persistence                    | Accepted       | Shared database logic, cross-platform support                                            |
