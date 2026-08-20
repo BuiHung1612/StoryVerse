@@ -32,7 +32,7 @@
 - [x] Phase 1 — Project Foundation & KMP Module Architecture
 - [x] Phase 2 — Shared Domain Models & Contracts
 - [x] Phase 3 — Networking Foundation
-- [ ] Phase 4 — StorySource Architecture
+- [x] Phase 4 — StorySource Architecture
 - [ ] Phase 5 — First Real Story Source
 - [ ] Phase 6 — Room KMP Persistence
 - [ ] Phase 7 — Android Native App Shell
@@ -119,15 +119,15 @@
 **Prerequisites:** Phase 3 complete.
 
 **Tasks**
-- [ ] Define StorySource contract for home/discovery, search/pagination, story detail, chapter list, chapter content.
-- [ ] Implement StorySourceRegistry/resolver by sourceId.
-- [ ] Add source capability metadata.
-- [ ] Prevent source implementations from leaking source-specific DTOs into domain/UI.
-- [ ] Prepare for RemoteStorySource, EpubStorySource, LocalStorySource, GeneratedStorySource.
+- [x] Define StorySource contract for home/discovery, search/pagination, story detail, chapter list, chapter content.
+- [x] Implement StorySourceRegistry/resolver by sourceId.
+- [x] Add source capability metadata.
+- [x] Prevent source implementations from leaking source-specific DTOs into domain/UI.
+- [x] Prepare for RemoteStorySource, EpubStorySource, LocalStorySource, GeneratedStorySource.
 
 **Definition of Done**
-- [ ] At least one stub source implemented and tested.
-- [ ] Registry and contract documented and validated.
+- [x] At least one stub source implemented and tested.
+- [x] Registry and contract documented and validated.
 
 ---
 
