@@ -30,7 +30,7 @@
 ## Progress Summary
 
 - [x] Phase 1 — Project Foundation & KMP Module Architecture
-- [ ] Phase 2 — Shared Domain Models & Contracts
+- [x] Phase 2 — Shared Domain Models & Contracts
 - [ ] Phase 3 — Networking Foundation
 - [ ] Phase 4 — StorySource Architecture
 - [ ] Phase 5 — First Real Story Source
@@ -82,15 +82,15 @@
 **Prerequisites:** Phase 1 complete.
 
 **Tasks**
-- [ ] Define StoryId as sourceId + remote/local id (collision-safe).
-- [ ] Implement Story, StoryDetail, Author, Category, Chapter, ChapterContent, StoryStatus, StorySourceInfo models.
-- [ ] Implement ReadingProgress, Bookmark, HistoryEntry, DownloadState models.
-- [ ] Distinguish REMOTE, LOCAL/EPUB, GENERATED story origins without coupling reader logic to origin.
-- [ ] Define repository contracts and error/result model.
+- [x] Define StoryId as sourceId + remote/local id (collision-safe).
+- [x] Implement Story, StoryDetail, Author, Category, Chapter, ChapterContent, StoryStatus, StorySourceInfo models.
+- [x] Implement ReadingProgress, Bookmark, HistoryEntry, DownloadState models.
+- [x] Distinguish REMOTE, LOCAL/EPUB, GENERATED story origins without coupling reader logic to origin.
+- [x] Define repository contracts and error/result model.
 
 **Definition of Done**
-- [ ] All domain models and contracts are implemented and tested.
-- [ ] No platform-specific types leak into shared contracts.
+- [x] All domain models and contracts are implemented and tested.
+- [x] No platform-specific types leak into shared contracts.
 
 ---
 
