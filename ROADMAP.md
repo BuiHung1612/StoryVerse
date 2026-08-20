@@ -31,7 +31,7 @@
 
 - [x] Phase 1 — Project Foundation & KMP Module Architecture
 - [x] Phase 2 — Shared Domain Models & Contracts
-- [ ] Phase 3 — Networking Foundation
+- [x] Phase 3 — Networking Foundation
 - [ ] Phase 4 — StorySource Architecture
 - [ ] Phase 5 — First Real Story Source
 - [ ] Phase 6 — Room KMP Persistence
@@ -100,16 +100,16 @@
 **Prerequisites:** Phase 2 complete.
 
 **Tasks**
-- [ ] Configure Ktor Client common settings (timeouts, headers, logging, error mapping).
-- [ ] Set up Android engine and iOS Darwin engine.
-- [ ] Integrate kotlinx.serialization.
-- [ ] Implement safe retry logic only where appropriate.
-- [ ] Map network DTOs to domain models.
-- [ ] Write tests with Ktor mock engine.
+- [x] Configure Ktor Client common settings (timeouts, headers, logging, error mapping).
+- [x] Set up Android engine and iOS Darwin engine.
+- [x] Integrate kotlinx.serialization.
+- [x] Implement safe retry logic only where appropriate.
+- [x] Map network DTOs to domain models.
+- [x] Write tests with Ktor mock engine.
 
 **Definition of Done**
-- [ ] Networking layer is testable and supports both platforms.
-- [ ] Domain/data separation is maintained.
+- [x] Networking layer is testable and supports both platforms.
+- [x] Domain/data separation is maintained.
 
 ---
 

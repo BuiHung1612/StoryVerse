@@ -2,6 +2,8 @@ package com.slowbuild.storyverse.di
 
 import com.slowbuild.storyverse.core.dispatcher.DefaultDispatcherProvider
 import com.slowbuild.storyverse.core.dispatcher.DispatcherProvider
+import com.slowbuild.storyverse.data.network.client.HttpClientFactory
+import io.ktor.client.HttpClient
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
@@ -16,7 +18,7 @@ val domainModule = module {
 }
 
 val dataModule = module {
-    // Shared data sources / repositories (Phase 3+)
+    single<HttpClient> { HttpClientFactory.create() }
 }
 
 expect val platformModule: Module
