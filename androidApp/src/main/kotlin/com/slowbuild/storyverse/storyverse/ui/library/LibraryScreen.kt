@@ -84,6 +84,16 @@ fun LibraryScreen(
             contentColor = MaterialTheme.colorScheme.primary
         ) {
             Tab(
+                selected = uiState.selectedTab == LibraryTab.BOOKSHELF,
+                onClick = { viewModel.selectTab(LibraryTab.BOOKSHELF) },
+                text = {
+                    Text(
+                        text = localizedString(AppStringKey.LIBRARY_TAB_FAVORITES),
+                        fontWeight = if (uiState.selectedTab == LibraryTab.BOOKSHELF) FontWeight.Bold else FontWeight.Normal
+                    )
+                }
+            )
+            Tab(
                 selected = uiState.selectedTab == LibraryTab.HISTORY,
                 onClick = { viewModel.selectTab(LibraryTab.HISTORY) },
                 text = {
@@ -94,12 +104,12 @@ fun LibraryScreen(
                 }
             )
             Tab(
-                selected = uiState.selectedTab == LibraryTab.BOOKSHELF,
-                onClick = { viewModel.selectTab(LibraryTab.BOOKSHELF) },
+                selected = uiState.selectedTab == LibraryTab.DOWNLOADS,
+                onClick = { viewModel.selectTab(LibraryTab.DOWNLOADS) },
                 text = {
                     Text(
-                        text = localizedString(AppStringKey.LIBRARY_TAB_FAVORITES),
-                        fontWeight = if (uiState.selectedTab == LibraryTab.BOOKSHELF) FontWeight.Bold else FontWeight.Normal
+                        text = localizedString(AppStringKey.LIBRARY_TAB_DOWNLOADS),
+                        fontWeight = if (uiState.selectedTab == LibraryTab.DOWNLOADS) FontWeight.Bold else FontWeight.Normal
                     )
                 }
             )
@@ -107,11 +117,32 @@ fun LibraryScreen(
 
         // Tab Content
         when (uiState.selectedTab) {
+            LibraryTab.BOOKSHELF -> {
+                if (uiState.savedStories.isEmpty()) {
+                    EmptyView(
+                        title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
+                        message = localizedString(AppStringKey.LIBRARY_EMPTY_SUBTITLE)
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(uiState.savedStories) { story ->
+                            StoryRowItem(
+                                story = story,
+                                onClick = { onStoryClick(story) }
+                            )
+                        }
+                    }
+                }
+            }
             LibraryTab.HISTORY -> {
                 if (uiState.historyEntries.isEmpty()) {
                     EmptyView(
                         title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
-                        message = "Truyện bạn đã đọc sẽ xuất hiện tại đây"
+                        message = localizedString(AppStringKey.LIBRARY_EMPTY_SUBTITLE)
                     )
                 } else {
                     LazyColumn(
@@ -131,26 +162,11 @@ fun LibraryScreen(
                     }
                 }
             }
-            LibraryTab.BOOKSHELF -> {
-                if (uiState.savedStories.isEmpty()) {
-                    EmptyView(
-                        title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
-                        message = "Bạn chưa lưu truyện nào vào tủ sách"
-                    )
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(uiState.savedStories) { story ->
-                            StoryRowItem(
-                                story = story,
-                                onClick = { onStoryClick(story) }
-                            )
-                        }
-                    }
-                }
+            LibraryTab.DOWNLOADS -> {
+                EmptyView(
+                    title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
+                    message = localizedString(AppStringKey.LIBRARY_EMPTY_SUBTITLE)
+                )
             }
         }
     }

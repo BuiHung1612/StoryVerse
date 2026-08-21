@@ -14,14 +14,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 enum class LibraryTab {
+    BOOKSHELF,
     HISTORY,
-    BOOKSHELF
+    DOWNLOADS
 }
 
 data class LibraryUiState(
-    val selectedTab: LibraryTab = LibraryTab.HISTORY,
+    val selectedTab: LibraryTab = LibraryTab.BOOKSHELF,
     val historyEntries: List<HistoryEntry> = emptyList(),
     val savedStories: List<Story> = emptyList(),
+    val downloadedStories: List<Story> = emptyList(),
     val isLoading: Boolean = false
 )
 
