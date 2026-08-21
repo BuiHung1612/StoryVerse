@@ -14,6 +14,6 @@ val appModule = module {
     viewModel { SearchViewModel(get()) }
     viewModel { LibraryViewModel(get(), get()) }
     viewModel { StoryDetailViewModel(get(), get(), get(), get()) }
-    viewModel { ReaderViewModel(get(), get(), get()) }
+    viewModel { ReaderViewModel(get()) }
     viewModel { SettingsViewModel(get(), get(), get()) }
 }

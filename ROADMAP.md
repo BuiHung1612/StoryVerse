@@ -40,7 +40,7 @@
 - [x] Phase 9 — Android Native App Shell
 - [x] Phase 10 — iOS Native App Shell
 - [x] Phase 11 — Story Discovery, Search & Detail
-- [ ] Phase 12 — Reader Core
+- [x] Phase 12 — Reader Core
 - [ ] Phase 13 — Reader Preferences, Progress, Bookmark & History
 - [ ] Phase 14 — Offline Download Manager
 - [ ] Phase 15 — ContentProcessor & Normalization
@@ -287,16 +287,20 @@
 **Prerequisites:** Phase 11 complete.
 
 **Tasks**
-- [ ] Implement ReaderRepository/open-story flow (origin-agnostic).
-- [ ] Fetch/cache current chapter and prefetch adjacent chapters.
-- [ ] Support next/previous chapter navigation.
-- [ ] Implement scroll-based reading (page-mode optional/future).
-- [ ] Share reader state model only where sensible; keep UI native.
-- [ ] Handle huge chapters and chapter load failures robustly.
+- [x] Implement ReaderUseCase & session flow (origin-agnostic across REMOTE, LOCAL, and GENERATED stories).
+- [x] Fetch/cache current chapter and asynchronous background prefetch for adjacent chapters (next & previous).
+- [x] Support next/previous chapter navigation with end-of-chapter jump buttons and floating bottom controls.
+- [x] Table of Contents (TOC) sheet / modal with full chapter list, active chapter indicator, and instant jumping.
+- [x] Implement scroll-based reading with individual paragraph rendering, word count, and estimated reading time badges.
+- [x] Immersive fullscreen reading toggle with animated slide overlays for top/bottom navigation controls.
+- [x] Bookmark toggle and automatic reading progress & history recording.
+- [x] Handle large chapters, source fallback, and chapter load failures robustly.
+- [x] Full feature and visual parity across Android (Jetpack Compose) and iOS (SwiftUI).
 
 **Definition of Done**
-- [ ] Reader works with REMOTE, LOCAL, and GENERATED stories.
-- [ ] Reader is robust against large chapters and errors.
+- [x] Reader works with REMOTE, LOCAL, and GENERATED stories.
+- [x] Reader is robust against large chapters and errors.
+- [x] Unit tests pass across commonTest, Android, and iOS simulator.
 
 ---
 

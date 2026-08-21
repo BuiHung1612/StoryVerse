@@ -57,6 +57,9 @@ class KoinModuleTest : KoinTest {
         val readerRepo = get<ReaderRepository>()
         assertNotNull(readerRepo)
 
+        val readerUseCase = get<com.slowbuild.storyverse.domain.usecase.ReaderUseCase>()
+        assertNotNull(readerUseCase)
+
         val registry = get<StorySourceRegistry>()
         assertNotNull(registry)
         assertNotNull(registry.getDefaultSource())

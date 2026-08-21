@@ -23,6 +23,8 @@ import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
+import com.slowbuild.storyverse.domain.usecase.ReaderUseCase
+
 val coreModule = module {
     single<DispatcherProvider> { DefaultDispatcherProvider() }
     single<LocalizationRepository> { LocalizationRepositoryImpl() }
@@ -30,7 +32,7 @@ val coreModule = module {
 }
 
 val domainModule = module {
-    // Shared domain services / use cases (Phase 2+)
+    single { ReaderUseCase(storySourceRegistry = get(), localStoryCache = get(), readerRepository = get()) }
 }
 
 val dataModule = module {
