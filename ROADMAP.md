@@ -34,7 +34,7 @@
 - [x] Phase 3 — Networking Foundation
 - [x] Phase 4 — StorySource Architecture
 - [x] Phase 5 — Multi-Language & Unified Localization (i18n)
-- [ ] Phase 6 — Design System & Multi-Theme Architecture
+- [x] Phase 6 — Design System & Multi-Theme Architecture
 - [ ] Phase 7 — First Real Story Source
 - [ ] Phase 8 — Room KMP Persistence
 - [ ] Phase 9 — Android Native App Shell
@@ -160,23 +160,23 @@
 **Prerequisites:** Phase 5 complete.
 
 **Tasks**
-- [ ] Define core semantic color tokens (`ThemeColors`: Primary, OnPrimary, Secondary, Background, Surface, Card, Border, TextPrimary, TextSecondary, ReaderBackground, ReaderTextColor, Accent, Success, Warning, Error).
-- [ ] Design and implement reading themes tailored for StoryVerse:
+- [x] Define core semantic color tokens (`ThemeColors`: Primary, OnPrimary, Secondary, Background, Surface, Card, Border, TextPrimary, TextSecondary, ReaderBackground, ReaderTextColor, Accent, Success, Warning, Error).
+- [x] Design and implement reading themes tailored for StoryVerse:
   - **Light**: Default clean, high-contrast reading theme.
   - **Dark**: Night mode with soft contrast to prevent eye strain.
   - **Sepia / Warm**: Warm paper tone (amber/beige) optimized for long-form reading.
   - **Parchment / Vintage**: Vintage classic book paper tone.
   - **Midnight / OLED**: Pure black (#000000) for OLED battery efficiency.
   - **Forest / Emerald**: Calming dark green tone for soothing reading.
-- [ ] Implement `ThemeRepository` / `ThemeManager` in `sharedLogic` to persist and observe current theme (`AppThemePreset`, `ThemeMode: LIGHT, DARK, SYSTEM`).
-- [ ] Bridge theme tokens to:
+- [x] Implement `ThemeRepository` / `ThemeManager` in `sharedLogic` to persist and observe current theme (`AppThemePreset`, `ThemeMode: LIGHT, DARK, SYSTEM`).
+- [x] Bridge theme tokens to:
   - Android Jetpack Compose `StoryVerseTheme` (Color, Typography, Shape, Dimensions).
   - iOS SwiftUI `StoryVerseTheme` (Color extensions, Font styles, Spacings).
-- [ ] Write unit tests verifying color token completeness and contrast compliance.
+- [x] Write unit tests verifying color token completeness and contrast compliance.
 
 **Definition of Done**
-- [ ] Unified theme palette is defined and ready for Android Compose & iOS SwiftUI.
-- [ ] Theme switching is reactive and adding a new theme requires only defining a new `ThemeColors` preset.
+- [x] Unified theme palette is defined and ready for Android Compose & iOS SwiftUI.
+- [x] Theme switching is reactive and adding a new theme requires only defining a new `ThemeColors` preset.
 
 ---
 

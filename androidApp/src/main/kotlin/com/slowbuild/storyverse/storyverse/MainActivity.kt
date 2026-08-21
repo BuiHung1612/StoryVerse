@@ -32,6 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.slowbuild.storyverse.Greeting
 
+import com.slowbuild.storyverse.domain.i18n.AppStringKey
+import com.slowbuild.storyverse.domain.i18n.AppStrings
+import com.slowbuild.storyverse.storyverse.theme.StoryVerseTheme
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -62,7 +66,7 @@ fun MainScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "StoryVerse",
+                text = AppStrings.get(AppStringKey.APP_NAME),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -71,7 +75,7 @@ fun MainScreen() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Android Native Jetpack Compose",
+                text = AppStrings.get(AppStringKey.DISCOVER_TITLE),
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -83,7 +87,7 @@ fun MainScreen() {
                     greetingText = greeting.greet()
                 }
             ) {
-                Text("Get Greeting from Shared KMP")
+                Text(AppStrings.get(AppStringKey.TAB_DISCOVER))
             }
 
             if (greetingText.isNotEmpty()) {
@@ -105,13 +109,6 @@ fun MainScreen() {
             }
         }
     }
-}
-
-@Composable
-fun StoryVerseTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        content = content
-    )
 }
 
 @Preview(showBackground = true)

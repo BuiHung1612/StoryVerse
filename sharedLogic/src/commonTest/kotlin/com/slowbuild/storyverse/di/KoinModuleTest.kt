@@ -5,6 +5,8 @@ import com.slowbuild.storyverse.domain.i18n.AppStringKey
 import com.slowbuild.storyverse.domain.i18n.AppStrings
 import com.slowbuild.storyverse.domain.i18n.LocalizationRepository
 import com.slowbuild.storyverse.domain.source.StorySourceRegistry
+import com.slowbuild.storyverse.domain.theme.AppTheme
+import com.slowbuild.storyverse.domain.theme.ThemeRepository
 import io.ktor.client.HttpClient
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
@@ -30,6 +32,10 @@ class KoinModuleTest : KoinTest {
         val localizationRepo = get<LocalizationRepository>()
         assertNotNull(localizationRepo)
         assertEquals("StoryVerse", AppStrings.get(AppStringKey.APP_NAME))
+
+        val themeRepo = get<ThemeRepository>()
+        assertNotNull(themeRepo)
+        assertNotNull(AppTheme.currentColors)
 
         val httpClient = get<HttpClient>()
         assertNotNull(httpClient)
