@@ -48,6 +48,7 @@ fun StoryVerseApp() {
                 ) {
                     bottomNavItems.forEach { item ->
                         val isSelected = currentRoute == item.route
+                        val labelText = com.slowbuild.storyverse.storyverse.theme.localizedString(item.labelKey)
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
@@ -64,20 +65,22 @@ fun StoryVerseApp() {
                             icon = {
                                 Icon(
                                     imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                    contentDescription = AppStrings.get(item.labelKey)
+                                    contentDescription = labelText
                                 )
                             },
                             label = {
                                 Text(
-                                    text = AppStrings.get(item.labelKey),
+                                    text = labelText,
                                     fontSize = 11.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }

@@ -90,6 +90,7 @@ val VietnameseDictionary: Map<AppStringKey, String> = mapOf(
     AppStringKey.SETTINGS_LANGUAGE_TITLE to "Ngôn ngữ ứng dụng",
     AppStringKey.SETTINGS_SECTION_STORAGE to "Bộ Nhớ & Dữ Liệu",
     AppStringKey.SETTINGS_STORAGE_USAGE to "Dung lượng đã dùng",
+    AppStringKey.SETTINGS_ACTIVE_SOURCE to "Nguồn truyện hoạt động: {0}",
     AppStringKey.SETTINGS_CLEAR_CACHE to "Xóa bộ nhớ đệm",
     AppStringKey.SETTINGS_CLEAR_CACHE_SUCCESS to "Đã xóa sạch bộ nhớ đệm",
     AppStringKey.SETTINGS_SECTION_ABOUT to "Thông Tin Ứng Dụng",

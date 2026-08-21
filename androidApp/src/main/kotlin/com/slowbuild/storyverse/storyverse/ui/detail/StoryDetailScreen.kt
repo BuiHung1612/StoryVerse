@@ -69,7 +69,7 @@ fun StoryDetailScreen(
     Scaffold(
         topBar = {
             StoryVerseTopBar(
-                title = uiState.story?.title ?: AppStrings.get(AppStringKey.APP_NAME),
+                title = uiState.story?.title ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.APP_NAME),
                 canNavigateBack = true,
                 onNavigateBack = onNavigateBack,
                 actions = {
@@ -93,7 +93,7 @@ fun StoryDetailScreen(
             uiState.errorMessage != null && uiState.story == null -> {
                 ErrorView(
                     modifier = Modifier.padding(innerPadding),
-                    message = uiState.errorMessage ?: AppStrings.get(AppStringKey.ERROR_UNKNOWN),
+                    message = uiState.errorMessage ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.ERROR_UNKNOWN),
                     onRetry = { viewModel.loadStory(storyId) }
                 )
             }
@@ -152,7 +152,7 @@ fun StoryDetailScreen(
                                 Spacer(modifier = Modifier.height(6.dp))
 
                                 Text(
-                                    text = "${AppStrings.get(AppStringKey.DETAIL_AUTHOR)}: ${story.authorNames}",
+                                    text = "${com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_AUTHOR)}: ${story.authorNames}",
                                     fontSize = 13.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -160,7 +160,7 @@ fun StoryDetailScreen(
                                 Spacer(modifier = Modifier.height(4.dp))
 
                                 Text(
-                                    text = "${AppStrings.get(AppStringKey.DETAIL_STATUS)}: ${story.status.name}",
+                                    text = "${com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_STATUS)}: ${story.status.name}",
                                     fontSize = 13.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -168,7 +168,7 @@ fun StoryDetailScreen(
                                 Spacer(modifier = Modifier.height(4.dp))
 
                                 Text(
-                                    text = "${AppStrings.get(AppStringKey.DETAIL_CHAPTERS)}: ${story.totalChapters.coerceAtLeast(uiState.chapters.size)}",
+                                    text = "${com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_CHAPTERS)}: ${story.totalChapters.coerceAtLeast(uiState.chapters.size)}",
                                     fontSize = 13.sp,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Medium
@@ -206,9 +206,9 @@ fun StoryDetailScreen(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = if (isContinuing) {
-                                        AppStrings.get(AppStringKey.DETAIL_CONTINUE_READING)
+                                        com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_CONTINUE_READING)
                                     } else {
-                                        AppStrings.get(AppStringKey.DETAIL_READ_NOW)
+                                        com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_READ_NOW)
                                     }
                                 )
                             }
@@ -219,9 +219,9 @@ fun StoryDetailScreen(
                             ) {
                                 Text(
                                     text = if (uiState.isInLibrary) {
-                                        AppStrings.get(AppStringKey.DETAIL_IN_LIBRARY)
+                                        com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_IN_LIBRARY)
                                     } else {
-                                        AppStrings.get(AppStringKey.DETAIL_ADD_LIBRARY)
+                                        com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_ADD_LIBRARY)
                                     }
                                 )
                             }
@@ -262,7 +262,7 @@ fun StoryDetailScreen(
                             ) {
                                 Column(modifier = Modifier.padding(14.dp)) {
                                     Text(
-                                        text = AppStrings.get(AppStringKey.DETAIL_DESCRIPTION_TITLE),
+                                        text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_DESCRIPTION_TITLE),
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurface
@@ -288,7 +288,7 @@ fun StoryDetailScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = AppStrings.get(AppStringKey.DETAIL_CHAPTER_LIST_TITLE),
+                                text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.DETAIL_CHAPTER_LIST_TITLE),
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface

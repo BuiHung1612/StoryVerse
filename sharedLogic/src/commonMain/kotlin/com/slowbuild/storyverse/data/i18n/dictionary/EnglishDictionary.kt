@@ -90,6 +90,7 @@ val EnglishDictionary: Map<AppStringKey, String> = mapOf(
     AppStringKey.SETTINGS_LANGUAGE_TITLE to "App Language",
     AppStringKey.SETTINGS_SECTION_STORAGE to "Storage & Cache",
     AppStringKey.SETTINGS_STORAGE_USAGE to "Used Storage",
+    AppStringKey.SETTINGS_ACTIVE_SOURCE to "Active Story Source: {0}",
     AppStringKey.SETTINGS_CLEAR_CACHE to "Clear Cache",
     AppStringKey.SETTINGS_CLEAR_CACHE_SUCCESS to "Cache cleared successfully",
     AppStringKey.SETTINGS_SECTION_ABOUT to "About",

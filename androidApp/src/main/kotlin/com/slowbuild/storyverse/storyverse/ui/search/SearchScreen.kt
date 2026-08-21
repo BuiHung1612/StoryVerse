@@ -50,7 +50,7 @@ fun SearchScreen(
     Scaffold(
         topBar = {
             StoryVerseTopBar(
-                title = AppStrings.get(AppStringKey.TAB_SEARCH)
+                title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.TAB_SEARCH)
             )
         }
     ) { innerPadding ->
@@ -68,7 +68,7 @@ fun SearchScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 placeholder = {
                     Text(
-                        text = AppStrings.get(AppStringKey.SEARCH_HINT),
+                        text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.SEARCH_HINT),
                         fontSize = 14.sp
                     )
                 },
@@ -129,19 +129,19 @@ fun SearchScreen(
                 }
                 uiState.errorMessage != null -> {
                     ErrorView(
-                        message = uiState.errorMessage ?: AppStrings.get(AppStringKey.ERROR_UNKNOWN),
+                        message = uiState.errorMessage ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.ERROR_UNKNOWN),
                         onRetry = { viewModel.onQueryChange(uiState.query) }
                     )
                 }
                 uiState.hasSearched && uiState.searchResults.isEmpty() -> {
                     EmptyView(
-                        title = AppStrings.get(AppStringKey.SEARCH_NO_RESULTS),
+                        title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.SEARCH_NO_RESULTS),
                         message = "Thử tìm kiếm với từ khóa khác"
                     )
                 }
                 !uiState.hasSearched -> {
                     EmptyView(
-                        title = AppStrings.get(AppStringKey.TAB_SEARCH),
+                        title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.TAB_SEARCH),
                         message = "Nhập tên truyện, tác giả hoặc thể loại để tìm kiếm"
                     )
                 }

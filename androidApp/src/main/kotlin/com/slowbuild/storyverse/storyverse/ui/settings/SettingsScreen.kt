@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.slowbuild.storyverse.domain.i18n.AppLanguage
 import com.slowbuild.storyverse.domain.i18n.AppStringKey
-import com.slowbuild.storyverse.domain.i18n.AppStrings
+import com.slowbuild.storyverse.storyverse.theme.localizedString
 import com.slowbuild.storyverse.storyverse.theme.toComposeColor
 import com.slowbuild.storyverse.storyverse.ui.common.StoryVerseTopBar
 import org.koin.androidx.compose.koinViewModel
@@ -57,7 +57,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             StoryVerseTopBar(
-                title = AppStrings.get(AppStringKey.SETTINGS_TITLE)
+                title = localizedString(AppStringKey.SETTINGS_TITLE)
             )
         }
     ) { innerPadding ->
@@ -85,7 +85,7 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = AppStrings.get(AppStringKey.SETTINGS_THEME_TITLE),
+                                text = localizedString(AppStringKey.SETTINGS_THEME_TITLE),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -177,7 +177,7 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = AppStrings.get(AppStringKey.SETTINGS_LANGUAGE_TITLE),
+                                text = localizedString(AppStringKey.SETTINGS_LANGUAGE_TITLE),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -234,7 +234,7 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = AppStrings.get(AppStringKey.SETTINGS_SECTION_STORAGE),
+                                text = localizedString(AppStringKey.SETTINGS_SECTION_STORAGE),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -244,7 +244,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Nguồn truyện hoạt động: ${uiState.activeSourceName}",
+                            text = localizedString(AppStringKey.SETTINGS_ACTIVE_SOURCE, uiState.activeSourceName),
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -269,7 +269,7 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = AppStrings.get(AppStringKey.SETTINGS_SECTION_ABOUT),
+                                text = localizedString(AppStringKey.SETTINGS_SECTION_ABOUT),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -279,7 +279,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "StoryVerse Mobile v1.0.0 (Kotlin Multiplatform + Jetpack Compose)",
+                            text = "StoryVerse Mobile " + localizedString(AppStringKey.SETTINGS_VERSION_FORMAT, "1.0.0 (KMP + Compose)"),
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

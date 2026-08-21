@@ -61,7 +61,7 @@ fun LibraryScreen(
     Scaffold(
         topBar = {
             StoryVerseTopBar(
-                title = AppStrings.get(AppStringKey.LIBRARY_TITLE),
+                title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_TITLE),
                 actions = {
                     if (uiState.selectedTab == LibraryTab.HISTORY && uiState.historyEntries.isNotEmpty()) {
                         IconButton(onClick = { viewModel.clearHistory() }) {
@@ -92,7 +92,7 @@ fun LibraryScreen(
                     onClick = { viewModel.selectTab(LibraryTab.HISTORY) },
                     text = {
                         Text(
-                            text = AppStrings.get(AppStringKey.LIBRARY_TAB_HISTORY),
+                            text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_TAB_HISTORY),
                             fontWeight = if (uiState.selectedTab == LibraryTab.HISTORY) FontWeight.Bold else FontWeight.Normal
                         )
                     }
@@ -102,7 +102,7 @@ fun LibraryScreen(
                     onClick = { viewModel.selectTab(LibraryTab.BOOKSHELF) },
                     text = {
                         Text(
-                            text = AppStrings.get(AppStringKey.LIBRARY_TAB_FAVORITES),
+                            text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_TAB_FAVORITES),
                             fontWeight = if (uiState.selectedTab == LibraryTab.BOOKSHELF) FontWeight.Bold else FontWeight.Normal
                         )
                     }
@@ -114,7 +114,7 @@ fun LibraryScreen(
                 LibraryTab.HISTORY -> {
                     if (uiState.historyEntries.isEmpty()) {
                         EmptyView(
-                            title = AppStrings.get(AppStringKey.LIBRARY_EMPTY_TITLE),
+                            title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
                             message = "Truyện bạn đã đọc sẽ xuất hiện tại đây"
                         )
                     } else {
@@ -138,7 +138,7 @@ fun LibraryScreen(
                 LibraryTab.BOOKSHELF -> {
                     if (uiState.savedStories.isEmpty()) {
                         EmptyView(
-                            title = AppStrings.get(AppStringKey.LIBRARY_EMPTY_TITLE),
+                            title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
                             message = "Bạn chưa lưu truyện nào vào tủ sách"
                         )
                     } else {

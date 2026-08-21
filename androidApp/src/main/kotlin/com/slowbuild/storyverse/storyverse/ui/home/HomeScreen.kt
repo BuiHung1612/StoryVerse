@@ -59,7 +59,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             StoryVerseTopBar(
-                title = AppStrings.get(AppStringKey.APP_NAME)
+                title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.APP_NAME)
             )
         }
     ) { innerPadding ->
@@ -70,7 +70,7 @@ fun HomeScreen(
             uiState.errorMessage != null -> {
                 ErrorView(
                     modifier = Modifier.padding(innerPadding),
-                    message = uiState.errorMessage ?: AppStrings.get(AppStringKey.ERROR_UNKNOWN),
+                    message = uiState.errorMessage ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.ERROR_UNKNOWN),
                     onRetry = { viewModel.loadHomeData() }
                 )
             }
@@ -95,7 +95,7 @@ fun HomeScreen(
                     // Popular / Top Rated Horizontal Section
                     if (uiState.topRatedStories.isNotEmpty()) {
                         item {
-                            SectionHeader(title = AppStrings.get(AppStringKey.SECTION_POPULAR))
+                            SectionHeader(title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.SECTION_POPULAR))
                             Spacer(modifier = Modifier.height(8.dp))
                             LazyRow(
                                 contentPadding = PaddingValues(horizontal = 16.dp),
@@ -114,7 +114,7 @@ fun HomeScreen(
                     // Latest Stories Vertical List
                     if (uiState.latestStories.isNotEmpty()) {
                         item {
-                            SectionHeader(title = AppStrings.get(AppStringKey.SECTION_LATEST))
+                            SectionHeader(title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.SECTION_LATEST))
                         }
                         items(uiState.latestStories) { story ->
                             Box(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -184,7 +184,7 @@ fun FeaturedSection(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = AppStrings.get(AppStringKey.SECTION_FEATURED),
+                    text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.SECTION_FEATURED),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary

@@ -77,7 +77,7 @@ fun ReaderScreen(
                 exit = slideOutVertically(targetOffsetY = { -it })
             ) {
                 StoryVerseTopBar(
-                    title = uiState.currentChapter?.title ?: AppStrings.get(AppStringKey.APP_NAME),
+                    title = uiState.currentChapter?.title ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.APP_NAME),
                     canNavigateBack = true,
                     onNavigateBack = onNavigateBack
                 )
@@ -112,7 +112,7 @@ fun ReaderScreen(
             uiState.errorMessage != null -> {
                 ErrorView(
                     modifier = Modifier.padding(innerPadding),
-                    message = uiState.errorMessage ?: AppStrings.get(AppStringKey.ERROR_UNKNOWN),
+                    message = uiState.errorMessage ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.ERROR_UNKNOWN),
                     onRetry = { viewModel.loadChapter(storyId, chapterId) }
                 )
             }

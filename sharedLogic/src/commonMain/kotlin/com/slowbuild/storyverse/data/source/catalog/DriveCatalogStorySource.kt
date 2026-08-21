@@ -19,6 +19,7 @@ import com.slowbuild.storyverse.domain.source.StorySourceMetadata
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -54,8 +55,27 @@ class DriveCatalogStorySource(
             cachedItems?.let { return@withLock AppResult.Success(it) }
 
             AppLogger.i("DriveCatalog") { "Fetching remote story catalog from $catalogUrl" }
-            val fetchResult = executeApi(retryCount = 2) {
-                get(catalogUrl).body<DriveCatalogResponseDto>()
+            var fetchResult = executeApi(retryCount = 1) {
+                val response = get(catalogUrl)
+                val rawJson = response.bodyAsText()
+                val jsonParser = kotlinx.serialization.json.Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
+                jsonParser.decodeFromString<DriveCatalogResponseDto>(rawJson)
+            }
+
+            if (fetchResult is AppResult.Error && catalogUrl != FALLBACK_CATALOG_URL) {
+                AppLogger.i("DriveCatalog") { "Retrying with fallback catalog URL: $FALLBACK_CATALOG_URL" }
+                fetchResult = executeApi(retryCount = 1) {
+                    val response = get(FALLBACK_CATALOG_URL)
+                    val rawJson = response.bodyAsText()
+                    val jsonParser = kotlinx.serialization.json.Json {
+                        ignoreUnknownKeys = true
+                        isLenient = true
+                    }
+                    jsonParser.decodeFromString<DriveCatalogResponseDto>(rawJson)
+                }
             }
 
             when (fetchResult) {
@@ -257,5 +277,6 @@ class DriveCatalogStorySource(
     companion object {
         const val ID = "drive_catalog"
         const val DEFAULT_CATALOG_URL = "https://drive.usercontent.google.com/download?id=1DWHJG0sfKvcuSi-ElUgOHWm84oa7O1Ob&export=download&confirm=t"
+        const val FALLBACK_CATALOG_URL = "https://drive.google.com/uc?export=download&id=1DWHJG0sfKvcuSi-ElUgOHWm84oa7O1Ob"
     }
 }
