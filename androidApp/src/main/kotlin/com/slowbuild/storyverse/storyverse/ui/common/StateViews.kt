@@ -24,13 +24,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.slowbuild.storyverse.domain.i18n.AppStringKey
-import com.slowbuild.storyverse.domain.i18n.AppStrings
+import com.slowbuild.storyverse.storyverse.theme.localizedString
 
 @Composable
 fun LoadingView(
     modifier: Modifier = Modifier,
-    message: String = AppStrings.get(AppStringKey.READER_CHAPTER_LOADING)
+    message: String? = null
 ) {
+    val displayMessage = message ?: localizedString(AppStringKey.READER_CHAPTER_LOADING)
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -45,7 +46,7 @@ fun LoadingView(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = message,
+                text = displayMessage,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -56,9 +57,10 @@ fun LoadingView(
 @Composable
 fun ErrorView(
     modifier: Modifier = Modifier,
-    message: String = AppStrings.get(AppStringKey.ERROR_UNKNOWN),
+    message: String? = null,
     onRetry: (() -> Unit)? = null
 ) {
+    val displayMessage = message ?: localizedString(AppStringKey.ERROR_UNKNOWN)
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -77,7 +79,7 @@ fun ErrorView(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = message,
+                text = displayMessage,
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
@@ -85,7 +87,7 @@ fun ErrorView(
             if (onRetry != null) {
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(onClick = onRetry) {
-                    Text(text = AppStrings.get(AppStringKey.ACTION_RETRY))
+                    Text(text = localizedString(AppStringKey.ACTION_RETRY))
                 }
             }
         }
@@ -95,9 +97,10 @@ fun ErrorView(
 @Composable
 fun EmptyView(
     modifier: Modifier = Modifier,
-    title: String = AppStrings.get(AppStringKey.SEARCH_NO_RESULTS),
+    title: String? = null,
     message: String = ""
 ) {
+    val displayTitle = title ?: localizedString(AppStringKey.SEARCH_NO_RESULTS)
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -116,7 +119,7 @@ fun EmptyView(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = title,
+                text = displayTitle,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
