@@ -38,7 +38,7 @@
 - [x] Phase 7 — First Real Story Source
 - [x] Phase 8 — Room KMP Persistence
 - [x] Phase 9 — Android Native App Shell
-- [ ] Phase 10 — iOS Native App Shell
+- [x] Phase 10 — iOS Native App Shell
 - [ ] Phase 11 — Story Discovery, Search & Detail
 - [ ] Phase 12 — Reader Core
 - [ ] Phase 13 — Reader Preferences, Progress, Bookmark & History
@@ -247,14 +247,15 @@
 **Prerequisites:** Phase 8 complete.
 
 **Tasks**
-- [ ] Implement NavigationStack/tab structure for Home, Search, Library, Detail, Reader, Settings.
-- [ ] Bridge shared Flow/state to Swift-friendly observable state.
-- [ ] Access shared KMP dependencies.
-- [ ] Handle loading/error/empty states in UI.
+- [x] Implement NavigationStack/tab structure for Home, Search, Library, Detail, Reader, Settings with custom styled `MainTabView`.
+- [x] Bridge shared Flow/state to Swift-friendly observable state (`ThemeManager`, `LocalizationManager`, and MVVM Observable ViewModels).
+- [x] Access shared KMP dependencies (`KoinHelper` injecting repositories, local cache, story sources, and Room persistence).
+- [x] Handle loading, error (with retry), and empty states in UI (`LoadingView`, `ErrorView`, `EmptyView`).
 
 **Definition of Done**
-- [ ] All main screens are navigable and display stub data.
-- [ ] Shared logic is observable and usable in SwiftUI.
+- [x] All main screens are navigable and display live/catalog data.
+- [x] Shared logic is observable and usable in SwiftUI with real-time multi-theme and language switching.
+- [x] `xcodebuild` succeeds and multiplatform tests pass on iOS simulator (`:sharedLogic:iosSimulatorArm64Test`).
 
 ---
 

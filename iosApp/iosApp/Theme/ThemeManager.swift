@@ -30,7 +30,7 @@ public struct StoryVerseColors {
     public let readerBackground: Color
     public let readerTextColor: Color
     public let accent: Color
-    public let isDark: BooleanLiteralType
+    public let isDark: Bool
 
     public init(themeColors: ThemeColors) {
         self.primary = Color(argb: themeColors.primary)
@@ -54,7 +54,35 @@ public struct StoryVerseColors {
         self.isDark = themeColors.isDark
     }
 
-    public static var current: StoryVerseColors {
-        return StoryVerseColors(themeColors: AppTheme.shared.currentColors)
+    public static var fallback: StoryVerseColors {
+        StoryVerseColors(themeColors: AppTheme.shared.getFallbackColors())
+    }
+}
+
+@MainActor
+public final class ThemeManager: ObservableObject {
+    public static let shared = ThemeManager()
+
+    @Published public private(set) var colors: StoryVerseColors
+    @Published public private(set) var currentPreset: AppThemePreset
+
+    private let themeRepository: ThemeRepository
+
+    public init(themeRepository: ThemeRepository = KoinHelper().themeRepository) {
+        self.themeRepository = themeRepository
+        let preset = (themeRepository.currentPreset.value as? AppThemePreset) ?? AppThemePreset.light
+        let themeColors = (themeRepository.currentColors.value as? ThemeColors) ?? AppTheme.shared.getFallbackColors()
+        self.currentPreset = preset
+        self.colors = StoryVerseColors(themeColors: themeColors)
+    }
+
+    public func selectPreset(_ preset: AppThemePreset) {
+        themeRepository.setPreset(preset: preset)
+        self.currentPreset = preset
+        self.colors = StoryVerseColors(themeColors: themeRepository.getColorsForPreset(preset: preset))
+    }
+
+    public func getColors(for preset: AppThemePreset) -> StoryVerseColors {
+        StoryVerseColors(themeColors: themeRepository.getColorsForPreset(preset: preset))
     }
 }
