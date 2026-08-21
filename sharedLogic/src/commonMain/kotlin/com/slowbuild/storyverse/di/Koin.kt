@@ -2,9 +2,12 @@ package com.slowbuild.storyverse.di
 
 import com.slowbuild.storyverse.core.dispatcher.DefaultDispatcherProvider
 import com.slowbuild.storyverse.core.dispatcher.DispatcherProvider
+import com.slowbuild.storyverse.data.i18n.LocalizationRepositoryImpl
 import com.slowbuild.storyverse.data.network.client.HttpClientFactory
 import com.slowbuild.storyverse.data.source.StorySourceRegistryImpl
 import com.slowbuild.storyverse.data.source.stub.StubStorySource
+import com.slowbuild.storyverse.domain.i18n.AppStrings
+import com.slowbuild.storyverse.domain.i18n.LocalizationRepository
 import com.slowbuild.storyverse.domain.source.StorySourceRegistry
 import io.ktor.client.HttpClient
 import org.koin.core.context.startKoin
@@ -14,6 +17,7 @@ import org.koin.dsl.module
 
 val coreModule = module {
     single<DispatcherProvider> { DefaultDispatcherProvider() }
+    single<LocalizationRepository> { LocalizationRepositoryImpl() }
 }
 
 val domainModule = module {
@@ -40,6 +44,9 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
             dataModule,
             platformModule,
         )
+    }.also { koinApp ->
+        val localizationRepo = koinApp.koin.get<LocalizationRepository>()
+        AppStrings.initialize(localizationRepo)
     }
 
 fun initKoinIos() = initKoin {}

@@ -33,7 +33,7 @@
 - [x] Phase 2 — Shared Domain Models & Contracts
 - [x] Phase 3 — Networking Foundation
 - [x] Phase 4 — StorySource Architecture
-- [ ] Phase 5 — Multi-Language & Unified Localization (i18n)
+- [x] Phase 5 — Multi-Language & Unified Localization (i18n)
 - [ ] Phase 6 — Design System & Multi-Theme Architecture
 - [ ] Phase 7 — First Real Story Source
 - [ ] Phase 8 — Room KMP Persistence
@@ -139,18 +139,18 @@
 **Prerequisites:** Phase 4 complete.
 
 **Tasks**
-- [ ] Define shared string key catalog (`AppStringKeys` / `LocalizedStrings`) and translation architecture in `sharedLogic`.
-- [ ] Provide baseline translations for Vietnamese (`vi`) and English (`en`).
-- [ ] Implement `LocalizationRepository` / `LanguageManager` to query strings, select language (`AppLanguage: VI, EN`), and observe language changes via `StateFlow`.
-- [ ] Provide native consumption bridges:
+- [x] Define shared string key catalog (`AppStringKeys` / `LocalizedStrings`) and translation architecture in `sharedLogic`.
+- [x] Provide baseline translations for Vietnamese (`vi`) and English (`en`).
+- [x] Implement `LocalizationRepository` / `LanguageManager` to query strings, select language (`AppLanguage: VI, EN`), and observe language changes via `StateFlow`.
+- [x] Provide native consumption bridges:
   - Android Jetpack Compose helper (`rememberAppString(key)` / LocalProvider).
   - iOS SwiftUI helper (`AppStrings[key]` / Observable Object).
-- [ ] Support dynamic runtime language switching without restarting the entire app.
-- [ ] Write unit tests verifying 100% translation key parity between Vietnamese and English (no missing keys).
+- [x] Support dynamic runtime language switching without restarting the entire app.
+- [x] Write unit tests verifying 100% translation key parity between Vietnamese and English (no missing keys).
 
 **Definition of Done**
-- [ ] Text strings are centralized and shared; adding a new language only requires adding a translation dictionary.
-- [ ] Language switching is reactive and tested on both platforms.
+- [x] Text strings are centralized and shared; adding a new language only requires adding a translation dictionary.
+- [x] Language switching is reactive and tested on both platforms.
 
 ---
 

@@ -1,6 +1,9 @@
 package com.slowbuild.storyverse.di
 
 import com.slowbuild.storyverse.core.dispatcher.DispatcherProvider
+import com.slowbuild.storyverse.domain.i18n.AppStringKey
+import com.slowbuild.storyverse.domain.i18n.AppStrings
+import com.slowbuild.storyverse.domain.i18n.LocalizationRepository
 import com.slowbuild.storyverse.domain.source.StorySourceRegistry
 import io.ktor.client.HttpClient
 import org.koin.core.context.stopKoin
@@ -8,6 +11,7 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class KoinModuleTest : KoinTest {
@@ -22,6 +26,10 @@ class KoinModuleTest : KoinTest {
         initKoin()
         val dispatcherProvider = get<DispatcherProvider>()
         assertNotNull(dispatcherProvider)
+
+        val localizationRepo = get<LocalizationRepository>()
+        assertNotNull(localizationRepo)
+        assertEquals("StoryVerse", AppStrings.get(AppStringKey.APP_NAME))
 
         val httpClient = get<HttpClient>()
         assertNotNull(httpClient)
