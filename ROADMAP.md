@@ -33,26 +33,28 @@
 - [x] Phase 2 — Shared Domain Models & Contracts
 - [x] Phase 3 — Networking Foundation
 - [x] Phase 4 — StorySource Architecture
-- [ ] Phase 5 — First Real Story Source
-- [ ] Phase 6 — Room KMP Persistence
-- [ ] Phase 7 — Android Native App Shell
-- [ ] Phase 8 — iOS Native App Shell
-- [ ] Phase 9 — Story Discovery, Search & Detail
-- [ ] Phase 10 — Reader Core
-- [ ] Phase 11 — Reader Preferences, Progress, Bookmark & History
-- [ ] Phase 12 — Offline Download Manager
-- [ ] Phase 13 — ContentProcessor & Normalization
-- [ ] Phase 14 — Local AI Feasibility Spike
-- [ ] Phase 15 — LocalAIEngine & Model Manager
-- [ ] Phase 16 — Reader AI MVP
-- [ ] Phase 17 — Story Memory & Context Builder
-- [ ] Phase 18 — AI Story Project Foundation
-- [ ] Phase 19 — AI Chapter Generation & Streaming
-- [ ] Phase 20 — EPUB & Local Story Import
-- [ ] Phase 21 — TTS Architecture & Local Voice Integration
-- [ ] Phase 22 — Audio Player & Background Playback
-- [ ] Phase 23 — Payments & Entitlements
-- [ ] Phase 24 — Testing, Performance, Reliability & Release
+- [ ] Phase 5 — Multi-Language & Unified Localization (i18n)
+- [ ] Phase 6 — Design System & Multi-Theme Architecture
+- [ ] Phase 7 — First Real Story Source
+- [ ] Phase 8 — Room KMP Persistence
+- [ ] Phase 9 — Android Native App Shell
+- [ ] Phase 10 — iOS Native App Shell
+- [ ] Phase 11 — Story Discovery, Search & Detail
+- [ ] Phase 12 — Reader Core
+- [ ] Phase 13 — Reader Preferences, Progress, Bookmark & History
+- [ ] Phase 14 — Offline Download Manager
+- [ ] Phase 15 — ContentProcessor & Normalization
+- [ ] Phase 16 — Local AI Feasibility Spike
+- [ ] Phase 17 — LocalAIEngine & Model Manager
+- [ ] Phase 18 — Reader AI MVP
+- [ ] Phase 19 — Story Memory & Context Builder
+- [ ] Phase 20 — AI Story Project Foundation
+- [ ] Phase 21 — AI Chapter Generation & Streaming
+- [ ] Phase 22 — EPUB & Local Story Import
+- [ ] Phase 23 — TTS Architecture & Local Voice Integration
+- [ ] Phase 24 — Audio Player & Background Playback
+- [ ] Phase 25 — Payments & Entitlements
+- [ ] Phase 26 — Testing, Performance, Reliability & Release
 
 ---
 
@@ -131,10 +133,57 @@
 
 ---
 
-### Phase 5 — First Real Story Source
-**Goal:** Integrate a real, usable story source end-to-end.
+### Phase 5 — Multi-Language & Unified Localization (i18n)
+**Goal:** Establish a centralized single source of truth for localized text strings and language switching, making it easy to add any new languages in the future.
 
 **Prerequisites:** Phase 4 complete.
+
+**Tasks**
+- [ ] Define shared string key catalog (`AppStringKeys` / `LocalizedStrings`) and translation architecture in `sharedLogic`.
+- [ ] Provide baseline translations for Vietnamese (`vi`) and English (`en`).
+- [ ] Implement `LocalizationRepository` / `LanguageManager` to query strings, select language (`AppLanguage: VI, EN`), and observe language changes via `StateFlow`.
+- [ ] Provide native consumption bridges:
+  - Android Jetpack Compose helper (`rememberAppString(key)` / LocalProvider).
+  - iOS SwiftUI helper (`AppStrings[key]` / Observable Object).
+- [ ] Support dynamic runtime language switching without restarting the entire app.
+- [ ] Write unit tests verifying 100% translation key parity between Vietnamese and English (no missing keys).
+
+**Definition of Done**
+- [ ] Text strings are centralized and shared; adding a new language only requires adding a translation dictionary.
+- [ ] Language switching is reactive and tested on both platforms.
+
+---
+
+### Phase 6 — Design System & Multi-Theme Architecture
+**Goal:** Build a flexible, multi-theme color palette system tailored for story reading, allowing seamless switching and easy addition of custom themes.
+
+**Prerequisites:** Phase 5 complete.
+
+**Tasks**
+- [ ] Define core semantic color tokens (`ThemeColors`: Primary, OnPrimary, Secondary, Background, Surface, Card, Border, TextPrimary, TextSecondary, ReaderBackground, ReaderTextColor, Accent, Success, Warning, Error).
+- [ ] Design and implement reading themes tailored for StoryVerse:
+  - **Light**: Default clean, high-contrast reading theme.
+  - **Dark**: Night mode with soft contrast to prevent eye strain.
+  - **Sepia / Warm**: Warm paper tone (amber/beige) optimized for long-form reading.
+  - **Parchment / Vintage**: Vintage classic book paper tone.
+  - **Midnight / OLED**: Pure black (#000000) for OLED battery efficiency.
+  - **Forest / Emerald**: Calming dark green tone for soothing reading.
+- [ ] Implement `ThemeRepository` / `ThemeManager` in `sharedLogic` to persist and observe current theme (`AppThemePreset`, `ThemeMode: LIGHT, DARK, SYSTEM`).
+- [ ] Bridge theme tokens to:
+  - Android Jetpack Compose `StoryVerseTheme` (Color, Typography, Shape, Dimensions).
+  - iOS SwiftUI `StoryVerseTheme` (Color extensions, Font styles, Spacings).
+- [ ] Write unit tests verifying color token completeness and contrast compliance.
+
+**Definition of Done**
+- [ ] Unified theme palette is defined and ready for Android Compose & iOS SwiftUI.
+- [ ] Theme switching is reactive and adding a new theme requires only defining a new `ThemeColors` preset.
+
+---
+
+### Phase 7 — First Real Story Source
+**Goal:** Integrate a real, usable story source end-to-end.
+
+**Prerequisites:** Phase 6 complete.
 
 **Tasks**
 - [ ] Integrate one actual usable story source (e.g., web or open API).
@@ -151,10 +200,10 @@
 
 ---
 
-### Phase 6 — Room KMP Persistence
+### Phase 8 — Room KMP Persistence
 **Goal:** Provide robust local persistence on both platforms.
 
-**Prerequisites:** Phase 5 complete.
+**Prerequisites:** Phase 7 complete.
 
 **Tasks**
 - [ ] Configure Room for Android and iOS.
@@ -169,14 +218,14 @@
 
 ---
 
-### Phase 7 — Android Native App Shell
+### Phase 9 — Android Native App Shell
 **Goal:** Build the native Android app shell using Jetpack Compose.
 
-**Prerequisites:** Phase 6 complete.
+**Prerequisites:** Phase 8 complete.
 
 **Tasks**
 - [ ] Implement navigation graph: Home, Search, Library, Story Detail, Reader, Settings.
-- [ ] Build Android design system/theme.
+- [ ] Connect Jetpack Compose theme to multi-theme system.
 - [ ] Connect ViewModels to StateFlow and lifecycle.
 - [ ] Inject dependencies with Koin and integrate shared repositories.
 - [ ] Handle loading/error/empty states in UI.
@@ -187,10 +236,10 @@
 
 ---
 
-### Phase 8 — iOS Native App Shell
+### Phase 10 — iOS Native App Shell
 **Goal:** Build the native iOS app shell using SwiftUI.
 
-**Prerequisites:** Phase 6 complete.
+**Prerequisites:** Phase 8 complete.
 
 **Tasks**
 - [ ] Implement NavigationStack/tab structure for Home, Search, Library, Detail, Reader, Settings.
@@ -204,10 +253,10 @@
 
 ---
 
-### Phase 9 — Story Discovery, Search & Detail
+### Phase 11 — Story Discovery, Search & Detail
 **Goal:** Implement discovery, search, and detail flows in both native UIs.
 
-**Prerequisites:** Phase 7 & 8 complete.
+**Prerequisites:** Phase 9 & 10 complete.
 
 **Tasks**
 - [ ] Display home sections sourced through StorySource.
@@ -223,10 +272,10 @@
 
 ---
 
-### Phase 10 — Reader Core
+### Phase 12 — Reader Core
 **Goal:** Implement the core reading experience.
 
-**Prerequisites:** Phase 9 complete.
+**Prerequisites:** Phase 11 complete.
 
 **Tasks**
 - [ ] Implement ReaderRepository/open-story flow (origin-agnostic).
@@ -242,10 +291,10 @@
 
 ---
 
-### Phase 11 — Reader Preferences, Progress, Bookmark & History
+### Phase 13 — Reader Preferences, Progress, Bookmark & History
 **Goal:** Add user preferences, progress tracking, bookmarks, and history.
 
-**Prerequisites:** Phase 10 complete.
+**Prerequisites:** Phase 12 complete.
 
 **Tasks**
 - [ ] Implement font size/family, line spacing, paragraph spacing, margins, theme/background.
@@ -261,10 +310,10 @@
 
 ---
 
-### Phase 12 — Offline Download Manager
+### Phase 14 — Offline Download Manager
 **Goal:** Enable offline reading with download management.
 
-**Prerequisites:** Phase 11 complete.
+**Prerequisites:** Phase 13 complete.
 
 **Tasks**
 - [ ] Implement shared download queue/domain state.
@@ -281,10 +330,10 @@
 
 ---
 
-### Phase 13 — ContentProcessor & Normalization
+### Phase 15 — ContentProcessor & Normalization
 **Goal:** Normalize chapter content for reading, AI, and TTS.
 
-**Prerequisites:** Phase 12 complete.
+**Prerequisites:** Phase 14 complete.
 
 **Tasks**
 - [ ] Implement RawChapterContent → ProcessedContent pipeline.
@@ -301,7 +350,7 @@
 
 ---
 
-### Phase 14 — Local AI Feasibility Spike
+### Phase 16 — Local AI Feasibility Spike
 **Goal:** Evaluate and benchmark on-device AI runtimes.
 
 **Prerequisites:** First real StorySource, Room persistence, and usable Reader working.
@@ -319,10 +368,10 @@
 
 ---
 
-### Phase 15 — LocalAIEngine & Model Manager
+### Phase 17 — LocalAIEngine & Model Manager
 **Goal:** Abstract and implement local AI engine and model management.
 
-**Prerequisites:** Phase 14 complete.
+**Prerequisites:** Phase 16 complete.
 
 **Tasks**
 - [ ] Define LocalAIEngine contract: load/unload, generate streaming/cancel, capabilities.
@@ -338,10 +387,10 @@
 
 ---
 
-### Phase 16 — Reader AI MVP
+### Phase 18 — Reader AI MVP
 **Goal:** Add basic AI-powered reading features.
 
-**Prerequisites:** Phase 15 complete.
+**Prerequisites:** Phase 17 complete.
 
 **Tasks**
 - [ ] Implement chapter summarization.
@@ -358,10 +407,10 @@
 
 ---
 
-### Phase 17 — Story Memory & Context Builder
+### Phase 19 — Story Memory & Context Builder
 **Goal:** Persist and build context for AI generation.
 
-**Prerequisites:** Phase 16 complete.
+**Prerequisites:** Phase 18 complete.
 
 **Tasks**
 - [ ] Implement chapter summaries, character records, world facts/lore, timeline/events.
@@ -376,10 +425,10 @@
 
 ---
 
-### Phase 18 — AI Story Project Foundation
+### Phase 20 — AI Story Project Foundation
 **Goal:** Enable user-driven AI story creation projects.
 
-**Prerequisites:** Phase 17 complete.
+**Prerequisites:** Phase 19 complete.
 
 **Tasks**
 - [ ] Implement AIStoryProject entity and repository.
@@ -394,10 +443,10 @@
 
 ---
 
-### Phase 19 — AI Chapter Generation & Streaming
+### Phase 21 — AI Chapter Generation & Streaming
 **Goal:** Generate and stream AI-written chapters.
 
-**Prerequisites:** Phase 18 complete.
+**Prerequisites:** Phase 20 complete.
 
 **Tasks**
 - [ ] Build prompts from project/world/characters/story memory/outline/recent chapters.
@@ -414,10 +463,10 @@
 
 ---
 
-### Phase 20 — EPUB & Local Story Import
+### Phase 22 — EPUB & Local Story Import
 **Goal:** Support importing and reading local EPUBs and files.
 
-**Prerequisites:** Phase 19 complete.
+**Prerequisites:** Phase 21 complete.
 
 **Tasks**
 - [ ] Support importing EPUB/local files.
@@ -433,10 +482,10 @@
 
 ---
 
-### Phase 21 — TTS Architecture & Local Voice Integration
+### Phase 23 — TTS Architecture & Local Voice Integration
 **Goal:** Add robust TTS with local voice models.
 
-**Prerequisites:** Stable ContentProcessor (Phase 13+) complete.
+**Prerequisites:** Stable ContentProcessor (Phase 15+) complete.
 
 **Tasks**
 - [ ] Define shared TtsEngine contract: model/profile lifecycle, synthesize/stream/cancel, capabilities.
@@ -451,10 +500,10 @@
 
 ---
 
-### Phase 22 — Audio Player & Background Playback
+### Phase 24 — Audio Player & Background Playback
 **Goal:** Enable audio playback and background controls.
 
-**Prerequisites:** Phase 21 complete.
+**Prerequisites:** Phase 23 complete.
 
 **Tasks**
 - [ ] Use platform-native audio stack: Android Media3, iOS AVFoundation/AVAudioSession.
@@ -470,10 +519,10 @@
 
 ---
 
-### Phase 23 — Payments & Entitlements
+### Phase 25 — Payments & Entitlements
 **Goal:** Add premium features with platform-native payments.
 
-**Prerequisites:** Phase 22 complete.
+**Prerequisites:** Phase 24 complete.
 
 **Tasks**
 - [ ] Define which features are premium (do not lock basic offline reader).
@@ -489,7 +538,7 @@
 
 ---
 
-### Phase 24 — Testing, Performance, Reliability & Release
+### Phase 26 — Testing, Performance, Reliability & Release
 **Goal:** Ensure quality, reliability, and prepare for release.
 
 **Prerequisites:** All previous phases complete.
@@ -513,13 +562,13 @@
 
 ## Milestones
 
-- **MVP Reader:** Phases 1-10
-- **Offline Reader:** Phases 11-12, 20
-- **Local AI Prototype:** Phases 13-15
-- **AI Reader:** Phases 16-17
-- **AI Story Creator:** Phases 18-19
-- **Voice & Audio:** Phases 21-22
-- **Monetization / Production:** Phases 23-24
+- **MVP Foundation & Design:** Phases 1-6 (KMP Foundation, Domain, Network, Sources, i18n, Multi-Theme)
+- **MVP Reader App:** Phases 7-12 (Real Source, Room DB, Android & iOS Shells, Discovery & Reader)
+- **Offline Reader & Customization:** Phases 13-15, 22
+- **Local AI Prototype & Reader AI:** Phases 16-19
+- **AI Story Creator:** Phases 20-21
+- **Voice & Audio:** Phases 23-24
+- **Monetization & Release:** Phases 25-26
 
 ---
 
