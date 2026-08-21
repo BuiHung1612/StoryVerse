@@ -43,6 +43,19 @@ object DriveCatalogMapper {
             .replace("[^a-z0-9-]".toRegex(), "")
     }
 
+    fun generateCoverUrl(title: String, id: String): String {
+        // Use a stable hash of the ID to pick a background color
+        val colors = listOf(
+            "5D4037", "4E342E", "6D4C41", "795548", "8D6E63",
+            "3E2723", "4A148C", "1A237E", "004D40", "BF360C",
+            "880E4F", "01579B", "33691E", "827717", "E65100"
+        )
+        val colorIndex = kotlin.math.abs(id.hashCode()) % colors.size
+        val bg = colors[colorIndex]
+        val encodedTitle = title.take(20).replace(" ", "+")
+        return "https://ui-avatars.com/api/?name=$encodedTitle&size=300&background=$bg&color=fff&format=png&bold=true&rounded=false"
+    }
+
     fun toDomain(item: DriveCatalogItemDto, sourceId: String): Story {
         val parsed = parseFilename(item.name)
         val authors = if (parsed.author != null) {
@@ -62,7 +75,7 @@ object DriveCatalogMapper {
         return Story(
             id = StoryId.create(sourceId = sourceId, rawId = item.id),
             title = parsed.title,
-            coverUrl = null,
+            coverUrl = generateCoverUrl(parsed.title, item.id),
             authors = authors,
             categories = categories,
             status = StoryStatus.COMPLETED,

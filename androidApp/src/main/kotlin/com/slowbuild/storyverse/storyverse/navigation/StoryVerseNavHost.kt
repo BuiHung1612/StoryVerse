@@ -40,10 +40,11 @@ fun StoryVerseApp() {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             if (isTopLevelDestination) {
                 NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.primary
                 ) {
                     bottomNavItems.forEach { item ->

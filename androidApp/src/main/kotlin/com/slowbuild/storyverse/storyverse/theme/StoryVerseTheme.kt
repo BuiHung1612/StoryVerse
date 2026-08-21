@@ -1,7 +1,6 @@
 package com.slowbuild.storyverse.storyverse.theme
 
 import android.app.Activity
-import android.graphics.Color as AndroidColor
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -142,7 +141,7 @@ fun StoryVerseTheme(
         currentColors
     }
 
-    // Configure Edge-to-Edge System Bar Insets & Colors
+    // Configure status/nav bar icon appearance based on current theme lightness
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -151,8 +150,6 @@ fun StoryVerseTheme(
                 val insetsController = WindowCompat.getInsetsController(window, view)
                 insetsController.isAppearanceLightStatusBars = !activeColors.isDark
                 insetsController.isAppearanceLightNavigationBars = !activeColors.isDark
-                window.statusBarColor = AndroidColor.TRANSPARENT
-                window.navigationBarColor = AndroidColor.TRANSPARENT
             }
         }
     }
