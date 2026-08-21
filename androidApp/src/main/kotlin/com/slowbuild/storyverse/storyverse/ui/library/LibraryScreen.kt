@@ -104,8 +104,9 @@ fun LibraryScreen(
         // Tab Row with continuous animated indicator
         TabRow(
             selectedTabIndex = pagerState.currentPage,
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.primary,
+            divider = {},
             indicator = { tabPositions ->
                 if (tabPositions.isNotEmpty() && pagerState.currentPage < tabPositions.size) {
                     val currentPage = pagerState.currentPage
@@ -143,8 +144,11 @@ fun LibraryScreen(
                     LibraryTab.HISTORY -> AppStringKey.LIBRARY_TAB_HISTORY
                     LibraryTab.DOWNLOADS -> AppStringKey.LIBRARY_TAB_DOWNLOADS
                 }
+                val isSelected = pagerState.currentPage == index
                 Tab(
-                    selected = pagerState.currentPage == index,
+                    selected = isSelected,
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     onClick = {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
@@ -153,7 +157,9 @@ fun LibraryScreen(
                     text = {
                         Text(
                             text = localizedString(titleKey),
-                            fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
+                            fontSize = 14.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 )
