@@ -141,7 +141,7 @@ fun ReaderScreen(
                                             contentDescription = null
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text(text = "Chương trước", maxLines = 1)
+                                        Text(text = localizedString(AppStringKey.READER_PREV_CHAPTER), maxLines = 1)
                                     }
                                 }
 
@@ -150,7 +150,7 @@ fun ReaderScreen(
                                         onClick = { onNavigateChapter(nextChapter.id) },
                                         modifier = Modifier.weight(1f)
                                     ) {
-                                        Text(text = "Chương sau", maxLines = 1)
+                                        Text(text = localizedString(AppStringKey.READER_NEXT_CHAPTER), maxLines = 1)
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Icon(
                                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,

@@ -62,9 +62,17 @@ public struct StoryDetailView: View {
                                     .foregroundColor(themeManager.colors.textPrimary)
                                     .lineLimit(3)
 
-                                Text(detail.story.authorNames)
-                                    .font(.system(size: 14))
+                                Text("\(localizedString(AppStringKey.detailAuthor)): \(detail.story.authorNames)")
+                                    .font(.system(size: 13))
                                     .foregroundColor(themeManager.colors.textSecondary)
+
+                                Text("\(localizedString(AppStringKey.detailStatus)): \(detail.story.status.name)")
+                                    .font(.system(size: 13))
+                                    .foregroundColor(themeManager.colors.textSecondary)
+
+                                Text("\(localizedString(AppStringKey.detailChapters)): \(max(Int(detail.story.totalChapters), viewModel.chapters.count))")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(themeManager.colors.primary)
 
                                 if !detail.story.categories.isEmpty {
                                     FlowLayout(spacing: 6) {
@@ -79,6 +87,43 @@ public struct StoryDetailView: View {
                                         }
                                     }
                                 }
+                            }
+                        }
+                        .padding(.horizontal, 16)
+
+                        // Action Buttons
+                        HStack(spacing: 12) {
+                            Button(action: {
+                                if let firstChapter = viewModel.chapters.first {
+                                    selectedChapterId = firstChapter.id
+                                }
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "play.fill")
+                                        .font(.system(size: 14))
+                                    Text(localizedString(AppStringKey.detailReadNow))
+                                        .font(.system(size: 15, weight: .bold))
+                                }
+                                .foregroundColor(themeManager.colors.onPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(themeManager.colors.primary)
+                                .cornerRadius(10)
+                            }
+                            .disabled(viewModel.chapters.isEmpty)
+
+                            Button(action: { viewModel.toggleLibrary() }) {
+                                Text(viewModel.isInLibrary ? localizedString(AppStringKey.detailInLibrary) : localizedString(AppStringKey.detailAddLibrary))
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(viewModel.isInLibrary ? themeManager.colors.primary : themeManager.colors.textPrimary)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .background(themeManager.colors.card)
+                                    .cornerRadius(10)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(themeManager.colors.border, lineWidth: 1)
+                                    )
                             }
                         }
                         .padding(.horizontal, 16)

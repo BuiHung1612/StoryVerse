@@ -44,7 +44,11 @@ public struct HomeView: View {
                                         .frame(width: 80, height: 115)
                                         .clipShape(RoundedRectangle(cornerRadius: 10))
 
-                                        VStack(alignment: .leading, spacing: 6) {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(localizedString(AppStringKey.sectionFeatured))
+                                                .font(.system(size: 11, weight: .bold))
+                                                .foregroundColor(themeManager.colors.primary)
+
                                             Text(heroStory.title)
                                                 .font(.system(size: 16, weight: .bold))
                                                 .foregroundColor(themeManager.colors.textPrimary)
