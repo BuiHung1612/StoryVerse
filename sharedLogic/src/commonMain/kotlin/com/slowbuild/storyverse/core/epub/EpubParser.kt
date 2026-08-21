@@ -186,7 +186,7 @@ class EpubParser(
     }
 
     private fun parseXhtmlContent(xhtml: String): Pair<String?, List<String>> {
-        var clean = xhtml
+        val clean = xhtml
             .replace(xmlDeclRegex, "")
             .replace(doctypeRegex, "")
             .replace(commentRegex, "")
@@ -199,29 +199,25 @@ class EpubParser(
             ?: extractTagContent(clean, "h3")
             ?: extractTagContent(clean, "title")
 
-        // Split paragraphs
-        val paragraphs = mutableListOf<String>()
-        val pMatches = paragraphTagRegex.findAll(clean).toList()
+        // Format HTML tags into structural newlines:
+        // 1. Replace <br> and <hr>
+        val withLineBreaks = clean
+            .replace(Regex("(?i)<br\\s*/?>"), "\n")
+            .replace(Regex("(?i)<hr\\s*/?>"), "\n---\n")
 
-        if (pMatches.isNotEmpty()) {
-            for (match in pMatches) {
-                val rawP = match.groupValues[2]
-                val text = cleanHtmlToPlainText(rawP)
-                if (text.isNotBlank()) {
-                    paragraphs.add(text)
-                }
-            }
-        } else {
-            // Fallback: convert <br> to newlines and split
-            val converted = clean.replace(breakTagRegex, "\n")
-            val rawLines = htmlTagRegex.replace(converted, "").split("\n")
-            for (line in rawLines) {
-                val cleaned = decodeHtmlEntities(line.trim())
-                if (cleaned.isNotBlank()) {
-                    paragraphs.add(cleaned)
-                }
-            }
-        }
+        // 2. Replace block closing and opening tags with double newlines
+        val withBlockBreaks = withLineBreaks
+            .replace(Regex("(?i)</(p|div|section|article|li|tr|h[1-6])>"), "\n\n")
+            .replace(Regex("(?i)<(p|div|section|article|li|tr|h[1-6])[^>]*>"), "\n")
+
+        // 3. Strip all other XML/HTML tags
+        val rawText = htmlTagRegex.replace(withBlockBreaks, "")
+
+        // 4. Decode HTML entities and collect clean, non-empty paragraphs
+        val paragraphs = rawText
+            .split("\n")
+            .map { decodeHtmlEntities(it).trim() }
+            .filter { it.isNotBlank() }
 
         return Pair(headerTitle?.let { cleanHtmlToPlainText(it) }, paragraphs)
     }

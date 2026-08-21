@@ -185,7 +185,8 @@ public struct ReaderView: View {
                         .padding(.leading, 6)
                     }
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
+                    .padding(.top, 50)
+                    .padding(.bottom, 12)
                     .background(themeManager.colors.background.opacity(0.95))
                     .overlay(
                         Divider().background(themeManager.colors.border),
@@ -194,6 +195,7 @@ public struct ReaderView: View {
 
                     Spacer()
                 }
+                .ignoresSafeArea(edges: .top)
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
 
@@ -261,6 +263,10 @@ public struct ReaderView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
         .onAppear {
             viewModel.loadChapter(storyId: storyId, chapterId: chapterId)
         }
