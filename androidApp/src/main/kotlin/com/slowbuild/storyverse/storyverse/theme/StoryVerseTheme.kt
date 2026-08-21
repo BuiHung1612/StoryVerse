@@ -1,6 +1,10 @@
 package com.slowbuild.storyverse.storyverse.theme
 
 import android.app.Activity
+import android.graphics.drawable.ColorDrawable
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -13,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.slowbuild.storyverse.domain.i18n.AppLanguage
@@ -141,12 +146,24 @@ fun StoryVerseTheme(
         currentColors
     }
 
-    // Configure status/nav bar icon appearance based on current theme lightness
+    // Smoothly animate the background colour when the theme changes.
+    // This prevents the "header flash old color" artifact.
+    val targetBackground = Color(activeColors.background.toInt())
+    val animatedBackground by animateColorAsState(
+        targetValue = targetBackground,
+        animationSpec = tween(durationMillis = 300, easing = EaseInOut),
+        label = "themeBackground"
+    )
+
+    // Update the native window background to match animated color so no flash appears
+    // above/below the Compose layer during theme transitions.
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
+                // Keep native window bg in sync → eliminates the "old color" flash on TopBar
+                window.setBackgroundDrawable(ColorDrawable(animatedBackground.toArgb()))
                 val insetsController = WindowCompat.getInsetsController(window, view)
                 insetsController.isAppearanceLightStatusBars = !activeColors.isDark
                 insetsController.isAppearanceLightNavigationBars = !activeColors.isDark

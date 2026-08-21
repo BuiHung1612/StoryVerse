@@ -1,5 +1,13 @@
 package com.slowbuild.storyverse.storyverse.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -22,13 +30,61 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.slowbuild.storyverse.domain.i18n.AppStrings
+import com.slowbuild.storyverse.storyverse.theme.localizedString
 import com.slowbuild.storyverse.storyverse.ui.detail.StoryDetailScreen
 import com.slowbuild.storyverse.storyverse.ui.home.HomeScreen
 import com.slowbuild.storyverse.storyverse.ui.library.LibraryScreen
 import com.slowbuild.storyverse.storyverse.ui.reader.ReaderScreen
 import com.slowbuild.storyverse.storyverse.ui.search.SearchScreen
 import com.slowbuild.storyverse.storyverse.ui.settings.SettingsScreen
+
+// --- Animation constants ---
+private const val ANIM_DURATION_PUSH = 320      // Screen push (navigate forward)
+private const val ANIM_DURATION_POP = 280       // Screen pop (navigate back)
+private const val ANIM_DURATION_TAB = 220       // Tab switch
+private const val SLIDE_OFFSET = 0.25f          // Partial-slide (25%) for depth feel
+
+// ─── Enter transitions ────────────────────────────────────────────────────────
+
+/** Forward push: slide in from right + fade */
+private fun pushEnter(): EnterTransition =
+    slideInHorizontally(
+        initialOffsetX = { (it * SLIDE_OFFSET).toInt() },
+        animationSpec = tween(ANIM_DURATION_PUSH, easing = EaseInOut)
+    ) + fadeIn(tween(ANIM_DURATION_PUSH, easing = EaseInOut))
+
+/** Tab switch: soft fade-in only (no slide — avoids jarring direction) */
+private fun tabEnter(): EnterTransition =
+    fadeIn(tween(ANIM_DURATION_TAB, easing = EaseInOut))
+
+/** Pop return: slide in from left + fade */
+private fun popEnter(): EnterTransition =
+    slideInHorizontally(
+        initialOffsetX = { -(it * SLIDE_OFFSET).toInt() },
+        animationSpec = tween(ANIM_DURATION_POP, easing = EaseInOut)
+    ) + fadeIn(tween(ANIM_DURATION_POP, easing = EaseInOut))
+
+// ─── Exit transitions ────────────────────────────────────────────────────────
+
+/** Forward push exit: current screen slides out to left + fades */
+private fun pushExit(): ExitTransition =
+    slideOutHorizontally(
+        targetOffsetX = { -(it * SLIDE_OFFSET).toInt() },
+        animationSpec = tween(ANIM_DURATION_PUSH, easing = EaseInOut)
+    ) + fadeOut(tween(ANIM_DURATION_PUSH, easing = EaseInOut))
+
+/** Tab switch exit: soft fade-out only */
+private fun tabExit(): ExitTransition =
+    fadeOut(tween(ANIM_DURATION_TAB, easing = EaseInOut))
+
+/** Pop exit: current screen slides out to right + fades */
+private fun popExit(): ExitTransition =
+    slideOutHorizontally(
+        targetOffsetX = { (it * SLIDE_OFFSET).toInt() },
+        animationSpec = tween(ANIM_DURATION_POP, easing = EaseInOut)
+    ) + fadeOut(tween(ANIM_DURATION_POP, easing = EaseInOut))
+
+// ─── App root composable ─────────────────────────────────────────────────────
 
 @Composable
 fun StoryVerseApp() {
@@ -49,7 +105,7 @@ fun StoryVerseApp() {
                 ) {
                     bottomNavItems.forEach { item ->
                         val isSelected = currentRoute == item.route
-                        val labelText = com.slowbuild.storyverse.storyverse.theme.localizedString(item.labelKey)
+                        val labelText = localizedString(item.labelKey)
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
@@ -92,9 +148,15 @@ fun StoryVerseApp() {
         NavHost(
             navController = navController,
             startDestination = NavRoute.Home.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+
+            // Default transitions (for tab switches at the root graph level)
+            enterTransition = { tabEnter() },
+            exitTransition = { tabExit() },
+            popEnterTransition = { tabEnter() },
+            popExitTransition = { tabExit() }
         ) {
-            // Tab: Home
+            // ── Tab: Home ──────────────────────────────────────────────────
             composable(NavRoute.Home.route) {
                 HomeScreen(
                     onStoryClick = { story ->
@@ -103,7 +165,7 @@ fun StoryVerseApp() {
                 )
             }
 
-            // Tab: Search
+            // ── Tab: Search ────────────────────────────────────────────────
             composable(NavRoute.Search.route) {
                 SearchScreen(
                     onStoryClick = { story ->
@@ -112,7 +174,7 @@ fun StoryVerseApp() {
                 )
             }
 
-            // Tab: Library
+            // ── Tab: Library ───────────────────────────────────────────────
             composable(NavRoute.Library.route) {
                 LibraryScreen(
                     onStoryClick = { story ->
@@ -124,17 +186,21 @@ fun StoryVerseApp() {
                 )
             }
 
-            // Tab: Settings
+            // ── Tab: Settings ──────────────────────────────────────────────
             composable(NavRoute.Settings.route) {
                 SettingsScreen()
             }
 
-            // Screen: Story Detail
+            // ── Screen: Story Detail (push/pop) ───────────────────────────
             composable(
                 route = NavRoute.StoryDetail.route,
                 arguments = listOf(
                     navArgument("storyId") { type = NavType.StringType }
-                )
+                ),
+                enterTransition = { pushEnter() },
+                exitTransition = { pushExit() },
+                popEnterTransition = { popEnter() },
+                popExitTransition = { popExit() }
             ) { backStackEntry ->
                 val encodedStoryId = backStackEntry.arguments?.getString("storyId")
                 val storyId = NavRoute.StoryDetail.parseStoryId(encodedStoryId)
@@ -148,13 +214,17 @@ fun StoryVerseApp() {
                 )
             }
 
-            // Screen: Reader
+            // ── Screen: Reader (push/pop) ─────────────────────────────────
             composable(
                 route = NavRoute.Reader.route,
                 arguments = listOf(
                     navArgument("storyId") { type = NavType.StringType },
                     navArgument("chapterId") { type = NavType.StringType }
-                )
+                ),
+                enterTransition = { pushEnter() },
+                exitTransition = { pushExit() },
+                popEnterTransition = { popEnter() },
+                popExitTransition = { popExit() }
             ) { backStackEntry ->
                 val (storyId, chapterId) = NavRoute.Reader.parseArgs(
                     encodedStoryId = backStackEntry.arguments?.getString("storyId"),
