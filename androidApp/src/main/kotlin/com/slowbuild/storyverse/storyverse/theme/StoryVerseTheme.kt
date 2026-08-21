@@ -21,7 +21,7 @@ val LocalStoryVerseColors = staticCompositionLocalOf<ThemeColors> {
     AppTheme.getFallbackColors()
 }
 
-fun Long.toComposeColor(): Color = Color(this.toULong())
+fun Long.toComposeColor(): Color = Color(this.toInt())
 
 fun ThemeColors.toMaterialColorScheme(): ColorScheme {
     return if (isDark) {
