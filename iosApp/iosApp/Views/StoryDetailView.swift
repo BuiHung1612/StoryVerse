@@ -92,21 +92,21 @@ public struct StoryDetailView: View {
                         .padding(.horizontal, 16)
 
                         // Action Buttons
-                        HStack(spacing: 12) {
+                        HStack(spacing: 10) {
                             Button(action: {
                                 if let firstChapter = viewModel.chapters.first {
                                     selectedChapterId = firstChapter.id
                                 }
                             }) {
-                                HStack(spacing: 6) {
+                                HStack(spacing: 4) {
                                     Image(systemName: "play.fill")
-                                        .font(.system(size: 14))
+                                        .font(.system(size: 13))
                                     Text(localizedString(AppStringKey.detailReadNow))
-                                        .font(.system(size: 15, weight: .bold))
+                                        .font(.system(size: 14, weight: .bold))
                                 }
                                 .foregroundColor(themeManager.colors.onPrimary)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
+                                .padding(.vertical, 11)
                                 .background(themeManager.colors.primary)
                                 .cornerRadius(10)
                             }
@@ -114,10 +114,10 @@ public struct StoryDetailView: View {
 
                             Button(action: { viewModel.toggleLibrary() }) {
                                 Text(viewModel.isInLibrary ? localizedString(AppStringKey.detailInLibrary) : localizedString(AppStringKey.detailAddLibrary))
-                                    .font(.system(size: 15, weight: .semibold))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(viewModel.isInLibrary ? themeManager.colors.primary : themeManager.colors.textPrimary)
                                     .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
+                                    .padding(.vertical, 11)
                                     .background(themeManager.colors.card)
                                     .cornerRadius(10)
                                     .overlay(
@@ -125,6 +125,38 @@ public struct StoryDetailView: View {
                                             .stroke(themeManager.colors.border, lineWidth: 1)
                                     )
                             }
+
+                            // Download button
+                            Button(action: { viewModel.startDownload() }) {
+                                HStack(spacing: 4) {
+                                    if viewModel.isDownloading {
+                                        ProgressView()
+                                            .scaleEffect(0.7)
+                                        Text("\(Int(viewModel.downloadProgress * 100))%")
+                                            .font(.system(size: 12, weight: .bold))
+                                    } else if viewModel.isDownloaded {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.system(size: 13))
+                                        Text("Đã tải")
+                                            .font(.system(size: 13, weight: .semibold))
+                                    } else {
+                                        Image(systemName: "arrow.down.circle")
+                                            .font(.system(size: 13))
+                                        Text("Tải về")
+                                            .font(.system(size: 13, weight: .semibold))
+                                    }
+                                }
+                                .foregroundColor(viewModel.isDownloaded ? themeManager.colors.primary : themeManager.colors.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 11)
+                                .background(themeManager.colors.card)
+                                .cornerRadius(10)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(themeManager.colors.border, lineWidth: 1)
+                                )
+                            }
+                            .disabled(viewModel.isDownloaded || viewModel.isDownloading)
                         }
                         .padding(.horizontal, 16)
 

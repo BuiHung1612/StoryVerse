@@ -13,7 +13,7 @@ val appModule = module {
     viewModel { HomeViewModel(get()) }
     viewModel { SearchViewModel(get()) }
     viewModel { LibraryViewModel(get(), get()) }
-    viewModel { StoryDetailViewModel(get(), get(), get(), get()) }
+    viewModel { StoryDetailViewModel(get(), get(), get(), get(), get()) }
     viewModel { ReaderViewModel(get()) }
     viewModel { SettingsViewModel(get(), get(), get()) }
 }

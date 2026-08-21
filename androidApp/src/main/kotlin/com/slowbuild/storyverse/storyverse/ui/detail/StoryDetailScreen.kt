@@ -18,9 +18,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -221,6 +223,43 @@ fun StoryDetailScreen(
                                     localizedString(AppStringKey.DETAIL_ADD_LIBRARY)
                                 }
                             )
+                        }
+
+                        // Download Action Button
+                        val dl = uiState.downloadProgress
+                        val isDownloading = dl != null && dl.status == com.slowbuild.storyverse.domain.model.DownloadStatus.DOWNLOADING
+
+                        OutlinedButton(
+                            onClick = { viewModel.startDownload() },
+                            modifier = Modifier.weight(1f),
+                            enabled = !uiState.isDownloaded && !isDownloading
+                        ) {
+                            if (isDownloading) {
+                                androidx.compose.material3.CircularProgressIndicator(
+                                    modifier = Modifier.size(14.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = "${(dl!!.progress * 100).toInt()}%", fontSize = 12.sp)
+                            } else if (uiState.isDownloaded) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = "Đã tải", fontSize = 12.sp)
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDownward,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = "Tải về", fontSize = 12.sp)
+                            }
                         }
                     }
                 }

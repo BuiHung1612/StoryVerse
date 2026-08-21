@@ -6,6 +6,9 @@ public final class StoryDetailViewModel: ObservableObject {
     @Published public private(set) var story: StoryDetail? = nil
     @Published public private(set) var chapters: [Chapter] = []
     @Published public private(set) var isInLibrary: Bool = false
+    @Published public private(set) var isDownloaded: Bool = false
+    @Published public private(set) var isDownloading: Bool = false
+    @Published public private(set) var downloadProgress: Float = 0
     @Published public private(set) var readingProgress: ReadingProgress? = nil
     @Published public private(set) var isLoading: Bool = false
     @Published public private(set) var errorMessage: String? = nil
@@ -13,15 +16,18 @@ public final class StoryDetailViewModel: ObservableObject {
     private let storySourceRegistry: StorySourceRegistry
     private let readerRepository: ReaderRepository
     private let localCache: LocalStoryCache
+    private let downloadManager: DownloadManager
 
     public init(
         storySourceRegistry: StorySourceRegistry = KoinHelper().storySourceRegistry,
         readerRepository: ReaderRepository = KoinHelper().readerRepository,
-        localCache: LocalStoryCache = KoinHelper().localStoryCache
+        localCache: LocalStoryCache = KoinHelper().localStoryCache,
+        downloadManager: DownloadManager = KoinHelper().downloadManager
     ) {
         self.storySourceRegistry = storySourceRegistry
         self.readerRepository = readerRepository
         self.localCache = localCache
+        self.downloadManager = downloadManager
     }
 
     public func loadStory(storyId: String) {
@@ -37,25 +43,62 @@ public final class StoryDetailViewModel: ObservableObject {
 
         Task {
             do {
+                self.isDownloaded = (try await downloadManager.isStoryDownloaded(storyId: parsedStoryId)).boolValue
+
                 let detailResult = try await source.getStoryDetail(rawId: parsedStoryId.rawId)
                 if let detail = detailResult.getOrNull() as? StoryDetail {
                     self.story = detail
-                    // Cache story
                     try? await localCache.cacheStory(story: detail.story, accessedAt: Int64(Date().timeIntervalSince1970 * 1000))
                 } else if let err = detailResult.errorOrNull() {
                     self.errorMessage = err.message
                 }
 
-                let chaptersResult = try await source.getChapterList(rawId: parsedStoryId.rawId)
-                if let chapterList = chaptersResult.getOrNull() as? [Chapter] {
-                    self.chapters = chapterList
-                    try? await localCache.cacheChapters(chapters: chapterList)
+                // Check cached chapters
+                let cachedChapters = (try? await localCache.getCachedChapters(storyId: parsedStoryId)) ?? []
+                if !cachedChapters.isEmpty {
+                    self.chapters = cachedChapters
+                } else {
+                    let chaptersResult = try await source.getChapterList(rawId: parsedStoryId.rawId)
+                    if let chapterList = chaptersResult.getOrNull() as? [Chapter] {
+                        self.chapters = chapterList
+                        try? await localCache.cacheChapters(chapters: chapterList)
+                    }
                 }
 
                 self.isLoading = false
             } catch {
                 self.errorMessage = error.localizedDescription
                 self.isLoading = false
+            }
+        }
+    }
+
+    public func startDownload() {
+        guard let storyDetail = story, let downloadUrl = chapters.first?.url else { return }
+
+        isDownloading = true
+        downloadProgress = 0.05
+
+        Task {
+            do {
+                _ = try await downloadManager.startDownload(story: storyDetail.story, downloadUrl: downloadUrl) { progress in
+                    Task { @MainActor in
+                        self.downloadProgress = progress.progress
+                        if progress.status == .completed {
+                            self.isDownloading = false
+                            self.isDownloaded = true
+                            self.isInLibrary = true
+                            let parsedStoryId = StoryId.companion.from(compositeValue: storyDetail.story.id.value)
+                            if let reloaded = try? await self.localCache.getCachedChapters(storyId: parsedStoryId) {
+                                self.chapters = reloaded
+                            }
+                        } else if progress.status == .failed {
+                            self.isDownloading = false
+                        }
+                    }
+                }
+            } catch {
+                self.isDownloading = false
             }
         }
     }

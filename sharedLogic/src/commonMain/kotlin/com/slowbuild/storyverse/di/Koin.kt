@@ -17,6 +17,7 @@ import com.slowbuild.storyverse.domain.repository.ReaderRepository
 import com.slowbuild.storyverse.domain.source.StorySourceRegistry
 import com.slowbuild.storyverse.domain.theme.AppTheme
 import com.slowbuild.storyverse.domain.theme.ThemeRepository
+import com.slowbuild.storyverse.core.epub.EpubParser
 import io.ktor.client.HttpClient
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -66,6 +67,16 @@ val dataModule = module {
     single { get<StoryVerseDatabase>().historyDao() }
     single { get<StoryVerseDatabase>().downloadDao() }
     single { LocalStoryCache(storyDao = get(), chapterDao = get(), chapterContentDao = get()) }
+    single { EpubParser() }
+    single<com.slowbuild.storyverse.domain.download.DownloadManager> {
+        com.slowbuild.storyverse.data.download.DownloadManagerImpl(
+            httpClient = get(),
+            localStoryCache = get(),
+            downloadDao = get(),
+            storyDao = get(),
+            epubParser = get()
+        )
+    }
     single<ReaderRepository> {
         RoomReaderRepository(
             readingProgressDao = get(),

@@ -20,6 +20,7 @@ room = "2.7.2"
 sqlite = "2.6.0"
 ksp = "2.3.11"
 coil = "2.7.0"
+okio = "3.10.2"
 
 [libraries]
 # Kotlin & Test
@@ -45,6 +46,9 @@ kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 # Image Loading
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+
+# Okio (KMP I/O & Zip)
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 # Ktor Client
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
