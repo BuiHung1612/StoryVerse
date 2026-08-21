@@ -25,9 +25,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,6 +42,7 @@ import coil.compose.AsyncImage
 import com.slowbuild.storyverse.domain.i18n.AppStringKey
 import com.slowbuild.storyverse.domain.i18n.AppStrings
 import com.slowbuild.storyverse.domain.model.Story
+import com.slowbuild.storyverse.storyverse.theme.localizedString
 import com.slowbuild.storyverse.storyverse.ui.common.ErrorView
 import com.slowbuild.storyverse.storyverse.ui.common.LoadingView
 import com.slowbuild.storyverse.storyverse.ui.common.StoryCard
@@ -56,69 +57,49 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            StoryVerseTopBar(
-                title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.APP_NAME)
-            )
-        }
-    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize()) {
+        StoryVerseTopBar(
+            title = localizedString(AppStringKey.APP_NAME)
+        )
+
         when {
             uiState.isLoading -> {
-                LoadingView(modifier = Modifier.padding(innerPadding))
+                LoadingView(modifier = Modifier.fillMaxSize())
             }
             uiState.errorMessage != null -> {
                 ErrorView(
-                    modifier = Modifier.padding(innerPadding),
-                    message = uiState.errorMessage ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.ERROR_UNKNOWN),
+                    modifier = Modifier.fillMaxSize(),
+                    message = uiState.errorMessage ?: localizedString(AppStringKey.ERROR_UNKNOWN),
                     onRetry = { viewModel.loadHomeData() }
                 )
             }
             else -> {
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    // Hero Featured Carousel
-                    if (uiState.featuredStories.isNotEmpty()) {
-                        item {
-                            FeaturedSection(
-                                stories = uiState.featuredStories,
-                                onStoryClick = onStoryClick
-                            )
-                        }
+                // Hero Featured Carousel
+                if (uiState.featuredStories.isNotEmpty()) {
+                    item {
+                        FeaturedSection(
+                            stories = uiState.featuredStories,
+                            onStoryClick = onStoryClick
+                        )
                     }
+                }
 
-                    // Popular / Top Rated Horizontal Section
-                    if (uiState.topRatedStories.isNotEmpty()) {
-                        item {
-                            SectionHeader(title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.SECTION_POPULAR))
-                            Spacer(modifier = Modifier.height(8.dp))
-                            LazyRow(
-                                contentPadding = PaddingValues(horizontal = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                items(uiState.topRatedStories) { story ->
-                                    StoryCard(
-                                        story = story,
-                                        onClick = { onStoryClick(story) }
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Latest Stories Vertical List
-                    if (uiState.latestStories.isNotEmpty()) {
-                        item {
-                            SectionHeader(title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.SECTION_LATEST))
-                        }
-                        items(uiState.latestStories) { story ->
-                            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                StoryRowItem(
+                // Popular / Top Rated Horizontal Section
+                if (uiState.topRatedStories.isNotEmpty()) {
+                    item {
+                        SectionHeader(title = localizedString(AppStringKey.SECTION_POPULAR))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(uiState.topRatedStories) { story ->
+                                StoryCard(
                                     story = story,
                                     onClick = { onStoryClick(story) }
                                 )
@@ -126,9 +107,25 @@ fun HomeScreen(
                         }
                     }
                 }
+
+                // Latest Stories Vertical List
+                if (uiState.latestStories.isNotEmpty()) {
+                    item {
+                        SectionHeader(title = localizedString(AppStringKey.SECTION_LATEST))
+                    }
+                    items(uiState.latestStories) { story ->
+                        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                            StoryRowItem(
+                                story = story,
+                                onClick = { onStoryClick(story) }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
+}
 }
 
 @Composable
@@ -184,7 +181,7 @@ fun FeaturedSection(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.SECTION_FEATURED),
+                    text = localizedString(AppStringKey.SECTION_FEATURED),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary

@@ -31,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,49 +68,14 @@ fun ReaderScreen(
         listState.scrollToItem(0)
     }
 
-    Scaffold(
-        topBar = {
-            AnimatedVisibility(
-                visible = uiState.showControls,
-                enter = slideInVertically(initialOffsetY = { -it }),
-                exit = slideOutVertically(targetOffsetY = { -it })
-            ) {
-                StoryVerseTopBar(
-                    title = uiState.currentChapter?.title ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.APP_NAME),
-                    canNavigateBack = true,
-                    onNavigateBack = onNavigateBack
-                )
-            }
-        },
-        bottomBar = {
-            AnimatedVisibility(
-                visible = uiState.showControls,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it })
-            ) {
-                ReaderBottomControls(
-                    onPrevChapter = {
-                        viewModel.getPrevChapter()?.let { onNavigateChapter(it.id) }
-                    },
-                    onNextChapter = {
-                        viewModel.getNextChapter()?.let { onNavigateChapter(it.id) }
-                    },
-                    hasPrev = viewModel.getPrevChapter() != null,
-                    hasNext = viewModel.getNextChapter() != null,
-                    fontSizeSp = uiState.fontSizeSp,
-                    onIncreaseFont = { viewModel.increaseFontSize() },
-                    onDecreaseFont = { viewModel.decreaseFontSize() }
-                )
-            }
-        }
-    ) { innerPadding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         when {
             uiState.isLoading -> {
-                LoadingView(modifier = Modifier.padding(innerPadding))
+                LoadingView(modifier = Modifier.fillMaxSize())
             }
             uiState.errorMessage != null -> {
                 ErrorView(
-                    modifier = Modifier.padding(innerPadding),
+                    modifier = Modifier.fillMaxSize(),
                     message = uiState.errorMessage ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.ERROR_UNKNOWN),
                     onRetry = { viewModel.loadChapter(storyId, chapterId) }
                 )
@@ -121,7 +85,6 @@ fun ReaderScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -201,6 +164,41 @@ fun ReaderScreen(
                     }
                 }
             }
+        }
+
+        // Floating TopBar overlay (shown/hidden based on showControls)
+        AnimatedVisibility(
+            visible = uiState.showControls,
+            enter = slideInVertically(initialOffsetY = { -it }),
+            exit = slideOutVertically(targetOffsetY = { -it })
+        ) {
+            StoryVerseTopBar(
+                title = uiState.currentChapter?.title ?: com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.APP_NAME),
+                canNavigateBack = true,
+                onNavigateBack = onNavigateBack
+            )
+        }
+
+        // Floating BottomBar overlay (shown/hidden based on showControls)
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            visible = uiState.showControls,
+            enter = slideInVertically(initialOffsetY = { it }),
+            exit = slideOutVertically(targetOffsetY = { it })
+        ) {
+            ReaderBottomControls(
+                onPrevChapter = {
+                    viewModel.getPrevChapter()?.let { onNavigateChapter(it.id) }
+                },
+                onNextChapter = {
+                    viewModel.getNextChapter()?.let { onNavigateChapter(it.id) }
+                },
+                hasPrev = viewModel.getPrevChapter() != null,
+                hasNext = viewModel.getNextChapter() != null,
+                fontSizeSp = uiState.fontSizeSp,
+                onIncreaseFont = { viewModel.increaseFontSize() },
+                onDecreaseFont = { viewModel.decreaseFontSize() }
+            )
         }
     }
 }

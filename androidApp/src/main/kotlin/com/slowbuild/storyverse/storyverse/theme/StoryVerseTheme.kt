@@ -2,9 +2,6 @@ package com.slowbuild.storyverse.storyverse.theme
 
 import android.app.Activity
 import android.graphics.drawable.ColorDrawable
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.tween
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -40,83 +37,88 @@ val LocalAppLanguage = staticCompositionLocalOf<AppLanguage> {
 
 fun Long.toComposeColor(): Color = Color(this.toInt())
 
+/**
+ * Builds a complete MaterialTheme ColorScheme directly from [ThemeColors].
+ * Updates immediately and synchronously across all components (TopBar, Scaffold, Content, NavigationBar)
+ * without animation lag.
+ */
 fun ThemeColors.toMaterialColorScheme(): ColorScheme {
     return if (isDark) {
         darkColorScheme(
-            primary = primary.toComposeColor(),
-            onPrimary = onPrimary.toComposeColor(),
-            primaryContainer = primaryContainer.toComposeColor(),
-            onPrimaryContainer = onPrimaryContainer.toComposeColor(),
-            inversePrimary = onPrimaryContainer.toComposeColor(),
-            secondary = secondary.toComposeColor(),
-            onSecondary = onSecondary.toComposeColor(),
-            secondaryContainer = primaryContainer.toComposeColor(),
-            onSecondaryContainer = onPrimaryContainer.toComposeColor(),
-            tertiary = accent.toComposeColor(),
-            onTertiary = onPrimary.toComposeColor(),
-            tertiaryContainer = primaryContainer.toComposeColor(),
-            onTertiaryContainer = onPrimaryContainer.toComposeColor(),
-            background = background.toComposeColor(),
-            onBackground = onBackground.toComposeColor(),
-            surface = surface.toComposeColor(),
-            onSurface = onSurface.toComposeColor(),
-            surfaceVariant = surfaceVariant.toComposeColor(),
-            onSurfaceVariant = onSurfaceVariant.toComposeColor(),
-            surfaceTint = primary.toComposeColor(),
-            inverseSurface = onSurface.toComposeColor(),
-            inverseOnSurface = surface.toComposeColor(),
-            error = error.toComposeColor(),
-            onError = onError.toComposeColor(),
-            errorContainer = error.toComposeColor().copy(alpha = 0.2f),
-            onErrorContainer = error.toComposeColor(),
-            outline = border.toComposeColor(),
-            outlineVariant = border.toComposeColor().copy(alpha = 0.5f),
-            scrim = Color(0x99000000),
-            surfaceBright = surface.toComposeColor(),
-            surfaceDim = background.toComposeColor(),
-            surfaceContainer = surface.toComposeColor(),
-            surfaceContainerHigh = surfaceVariant.toComposeColor(),
-            surfaceContainerHighest = card.toComposeColor(),
-            surfaceContainerLow = background.toComposeColor(),
+            primary                = primary.toComposeColor(),
+            onPrimary              = onPrimary.toComposeColor(),
+            primaryContainer       = primaryContainer.toComposeColor(),
+            onPrimaryContainer     = onPrimaryContainer.toComposeColor(),
+            inversePrimary         = onPrimaryContainer.toComposeColor(),
+            secondary              = secondary.toComposeColor(),
+            onSecondary            = onSecondary.toComposeColor(),
+            secondaryContainer     = primaryContainer.toComposeColor(),
+            onSecondaryContainer   = onPrimaryContainer.toComposeColor(),
+            tertiary               = accent.toComposeColor(),
+            onTertiary             = onPrimary.toComposeColor(),
+            tertiaryContainer      = primaryContainer.toComposeColor(),
+            onTertiaryContainer    = onPrimaryContainer.toComposeColor(),
+            background             = background.toComposeColor(),
+            onBackground           = onBackground.toComposeColor(),
+            surface                = surface.toComposeColor(),
+            onSurface              = onSurface.toComposeColor(),
+            surfaceVariant         = surfaceVariant.toComposeColor(),
+            onSurfaceVariant       = onSurfaceVariant.toComposeColor(),
+            surfaceTint            = primary.toComposeColor(),
+            inverseSurface         = onSurface.toComposeColor(),
+            inverseOnSurface       = surface.toComposeColor(),
+            error                  = error.toComposeColor(),
+            onError                = onError.toComposeColor(),
+            errorContainer         = error.toComposeColor().copy(alpha = 0.2f),
+            onErrorContainer       = error.toComposeColor(),
+            outline                = border.toComposeColor(),
+            outlineVariant         = border.toComposeColor().copy(alpha = 0.5f),
+            scrim                  = Color(0x99000000),
+            surfaceBright          = surface.toComposeColor(),
+            surfaceDim             = background.toComposeColor(),
+            surfaceContainer       = surface.toComposeColor(),
+            surfaceContainerHigh   = surfaceVariant.toComposeColor(),
+            surfaceContainerHighest= card.toComposeColor(),
+            surfaceContainerLow    = background.toComposeColor(),
             surfaceContainerLowest = background.toComposeColor()
         )
     } else {
         lightColorScheme(
-            primary = primary.toComposeColor(),
-            onPrimary = onPrimary.toComposeColor(),
-            primaryContainer = primaryContainer.toComposeColor(),
-            onPrimaryContainer = onPrimaryContainer.toComposeColor(),
-            inversePrimary = onPrimaryContainer.toComposeColor(),
-            secondary = secondary.toComposeColor(),
-            onSecondary = onSecondary.toComposeColor(),
-            secondaryContainer = primaryContainer.toComposeColor(),
-            onSecondaryContainer = onPrimaryContainer.toComposeColor(),
-            tertiary = accent.toComposeColor(),
-            onTertiary = onPrimary.toComposeColor(),
-            tertiaryContainer = primaryContainer.toComposeColor(),
-            onTertiaryContainer = onPrimaryContainer.toComposeColor(),
-            background = background.toComposeColor(),
-            onBackground = onBackground.toComposeColor(),
-            surface = surface.toComposeColor(),
-            onSurface = onSurface.toComposeColor(),
-            surfaceVariant = surfaceVariant.toComposeColor(),
-            onSurfaceVariant = onSurfaceVariant.toComposeColor(),
-            surfaceTint = primary.toComposeColor(),
-            inverseSurface = onSurface.toComposeColor(),
-            inverseOnSurface = surface.toComposeColor(),
-            error = error.toComposeColor(),
-            onError = onError.toComposeColor(),
-            errorContainer = error.toComposeColor().copy(alpha = 0.1f),
-            onErrorContainer = error.toComposeColor(),
-            outline = border.toComposeColor(),
-            outlineVariant = border.toComposeColor().copy(alpha = 0.6f),
-            scrim = Color(0x66000000),
-            surfaceBright = surface.toComposeColor(),
-            surfaceDim = background.toComposeColor(),
-            surfaceContainer = surface.toComposeColor(),
-            surfaceContainerHigh = surfaceVariant.toComposeColor(),
-            surfaceContainerHighest = card.toComposeColor(),
-            surfaceContainerLow = background.toComposeColor(),
+            primary                = primary.toComposeColor(),
+            onPrimary              = onPrimary.toComposeColor(),
+            primaryContainer       = primaryContainer.toComposeColor(),
+            onPrimaryContainer     = onPrimaryContainer.toComposeColor(),
+            inversePrimary         = onPrimaryContainer.toComposeColor(),
+            secondary              = secondary.toComposeColor(),
+            onSecondary            = onSecondary.toComposeColor(),
+            secondaryContainer     = primaryContainer.toComposeColor(),
+            onSecondaryContainer   = onPrimaryContainer.toComposeColor(),
+            tertiary               = accent.toComposeColor(),
+            onTertiary             = onPrimary.toComposeColor(),
+            tertiaryContainer      = primaryContainer.toComposeColor(),
+            onTertiaryContainer    = onPrimaryContainer.toComposeColor(),
+            background             = background.toComposeColor(),
+            onBackground           = onBackground.toComposeColor(),
+            surface                = surface.toComposeColor(),
+            onSurface              = onSurface.toComposeColor(),
+            surfaceVariant         = surfaceVariant.toComposeColor(),
+            onSurfaceVariant       = onSurfaceVariant.toComposeColor(),
+            surfaceTint            = primary.toComposeColor(),
+            inverseSurface         = onSurface.toComposeColor(),
+            inverseOnSurface       = surface.toComposeColor(),
+            error                  = error.toComposeColor(),
+            onError                = onError.toComposeColor(),
+            errorContainer         = error.toComposeColor().copy(alpha = 0.1f),
+            onErrorContainer       = error.toComposeColor(),
+            outline                = border.toComposeColor(),
+            outlineVariant         = border.toComposeColor().copy(alpha = 0.6f),
+            scrim                  = Color(0x66000000),
+            surfaceBright          = surface.toComposeColor(),
+            surfaceDim             = background.toComposeColor(),
+            surfaceContainer       = surface.toComposeColor(),
+            surfaceContainerHigh   = surfaceVariant.toComposeColor(),
+            surfaceContainerHighest= card.toComposeColor(),
+            surfaceContainerLow    = background.toComposeColor(),
             surfaceContainerLowest = background.toComposeColor()
         )
     }
@@ -134,10 +136,12 @@ fun StoryVerseTheme(
         GlobalContext.getOrNull()?.get<LocalizationRepository>()
     }
 
-    val currentColors by (themeRepository?.currentColors ?: kotlinx.coroutines.flow.MutableStateFlow(AppTheme.getFallbackColors()))
+    val currentColors by (themeRepository?.currentColors
+        ?: kotlinx.coroutines.flow.MutableStateFlow(AppTheme.getFallbackColors()))
         .collectAsState(initial = AppTheme.getFallbackColors())
 
-    val currentLanguage by (localizationRepository?.currentLanguage ?: kotlinx.coroutines.flow.MutableStateFlow(AppLanguage.DEFAULT))
+    val currentLanguage by (localizationRepository?.currentLanguage
+        ?: kotlinx.coroutines.flow.MutableStateFlow(AppLanguage.DEFAULT))
         .collectAsState(initial = AppLanguage.DEFAULT)
 
     val activeColors = if (presetOverride != null && themeRepository != null) {
@@ -146,15 +150,17 @@ fun StoryVerseTheme(
         currentColors
     }
 
-    // Sync the native window background immediately whenever theme changes.
-    // This ensures the area behind Compose (status bar, nav bar) matches before
-    // any recomposition, eliminating the "old color flash" artifact.
+    val colorScheme = activeColors.toMaterialColorScheme()
+
+    // Sync the native window background and system bar icon colors immediately
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
-                window.setBackgroundDrawable(ColorDrawable(Color(activeColors.background.toInt()).toArgb()))
+                window.setBackgroundDrawable(
+                    ColorDrawable(Color(activeColors.background.toInt()).toArgb())
+                )
                 val insetsController = WindowCompat.getInsetsController(window, view)
                 insetsController.isAppearanceLightStatusBars = !activeColors.isDark
                 insetsController.isAppearanceLightNavigationBars = !activeColors.isDark
@@ -162,23 +168,14 @@ fun StoryVerseTheme(
         }
     }
 
-    // Use Crossfade to animate the entire UI subtree when the theme preset changes.
-    // This ensures ALL composables (TopBar, content, nav bar) transition simultaneously
-    // to the new theme colors — no partial flash where some components lag behind.
-    Crossfade(
-        targetState = activeColors,
-        animationSpec = tween(durationMillis = 350, easing = EaseInOut),
-        label = "themeTransition"
-    ) { colors ->
-        CompositionLocalProvider(
-            LocalStoryVerseColors provides colors,
-            LocalAppLanguage provides currentLanguage
-        ) {
-            MaterialTheme(
-                colorScheme = colors.toMaterialColorScheme(),
-                content = content
-            )
-        }
+    CompositionLocalProvider(
+        LocalStoryVerseColors provides activeColors,
+        LocalAppLanguage provides currentLanguage
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content = content
+        )
     }
 }
 
@@ -188,7 +185,6 @@ fun StoryVerseTheme(
  */
 @Composable
 fun localizedString(key: AppStringKey, vararg args: Any): String {
-    // Reading LocalAppLanguage.current guarantees recomposition on language change
-    LocalAppLanguage.current
+    LocalAppLanguage.current // triggers recomposition on language change
     return AppStrings.get(key, *args)
 }

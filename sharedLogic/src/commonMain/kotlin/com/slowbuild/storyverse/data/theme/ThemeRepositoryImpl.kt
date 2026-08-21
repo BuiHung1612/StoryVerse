@@ -42,8 +42,8 @@ class ThemeRepositoryImpl(
     override val currentColors: StateFlow<ThemeColors> = _currentColors.asStateFlow()
 
     override fun setPreset(preset: AppThemePreset) {
-        _currentPreset.value = preset
         _currentColors.value = getColorsForPreset(preset)
+        _currentPreset.value = preset
         AppLogger.i("Theme") { "Theme preset changed to: ${preset.id} (${preset.displayNameEn})" }
     }
 

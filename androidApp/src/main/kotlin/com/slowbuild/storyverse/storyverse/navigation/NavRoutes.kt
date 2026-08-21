@@ -9,11 +9,17 @@ import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.slowbuild.storyverse.domain.i18n.AppStringKey
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+
+// ─── Navigation route definitions ────────────────────────────────────────────
 
 sealed class NavRoute(val route: String) {
     data object Home : NavRoute("home")
@@ -48,6 +54,8 @@ sealed class NavRoute(val route: String) {
         }
     }
 }
+
+// ─── Bottom navigation items ──────────────────────────────────────────────────
 
 data class BottomNavItem(
     val route: String,

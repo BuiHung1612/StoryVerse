@@ -226,6 +226,10 @@
 **Tasks**
 - [x] Implement navigation graph: Home, Search, Library, Story Detail, Reader, Settings with BottomNavigationBar.
 - [x] Connect Jetpack Compose theme to multi-theme system (`StoryVerseTheme`, dynamic swatches).
+- [x] Eliminate theme switching latency and header color desync:
+  - Removed Material 3 `TopAppBar` tonal tint & animation cache; implemented direct, lightweight `StoryVerseTopBar` bound to `LocalStoryVerseColors`.
+  - Moved `StoryVerseTopBar` directly into each screen's composable hierarchy (eliminated root Scaffold state hoisting and 1-frame `SideEffect` delay).
+  - Synchronized `ThemeRepositoryImpl` state flow emission (`_currentColors` before `_currentPreset`) and window status bar background.
 - [x] Connect ViewModels to StateFlow, lifecycle, and shared domain models.
 - [x] Inject dependencies with Koin and integrate shared repositories and Room DAOs.
 - [x] Handle loading, error (with retry), and empty states in UI.
@@ -233,6 +237,7 @@
 **Definition of Done**
 - [x] All main screens are navigable and display live real/catalog data.
 - [x] State management and dependency injection are functional.
+- [x] Theme switching updates header, body, bottom bar, and status bar synchronously in a single frame without lag or color mismatch.
 
 ---
 

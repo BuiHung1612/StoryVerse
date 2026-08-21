@@ -25,11 +25,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -45,6 +45,7 @@ import com.slowbuild.storyverse.domain.i18n.AppStringKey
 import com.slowbuild.storyverse.domain.i18n.AppStrings
 import com.slowbuild.storyverse.domain.model.HistoryEntry
 import com.slowbuild.storyverse.domain.model.Story
+import com.slowbuild.storyverse.storyverse.theme.localizedString
 import com.slowbuild.storyverse.storyverse.ui.common.EmptyView
 import com.slowbuild.storyverse.storyverse.ui.common.StoryRowItem
 import com.slowbuild.storyverse.storyverse.ui.common.StoryVerseTopBar
@@ -58,101 +59,95 @@ fun LibraryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            StoryVerseTopBar(
-                title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_TITLE),
-                actions = {
-                    if (uiState.selectedTab == LibraryTab.HISTORY && uiState.historyEntries.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.clearHistory() }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Xóa lịch sử",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        StoryVerseTopBar(
+            title = localizedString(AppStringKey.LIBRARY_TITLE),
+            actions = {
+                if (uiState.selectedTab == LibraryTab.HISTORY && uiState.historyEntries.isNotEmpty()) {
+                    IconButton(onClick = { viewModel.clearHistory() }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Xóa lịch sử",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        )
+
+        // Tab Row
+        TabRow(
+            selectedTabIndex = uiState.selectedTab.ordinal,
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary
+        ) {
+            Tab(
+                selected = uiState.selectedTab == LibraryTab.HISTORY,
+                onClick = { viewModel.selectTab(LibraryTab.HISTORY) },
+                text = {
+                    Text(
+                        text = localizedString(AppStringKey.LIBRARY_TAB_HISTORY),
+                        fontWeight = if (uiState.selectedTab == LibraryTab.HISTORY) FontWeight.Bold else FontWeight.Normal
+                    )
+                }
+            )
+            Tab(
+                selected = uiState.selectedTab == LibraryTab.BOOKSHELF,
+                onClick = { viewModel.selectTab(LibraryTab.BOOKSHELF) },
+                text = {
+                    Text(
+                        text = localizedString(AppStringKey.LIBRARY_TAB_FAVORITES),
+                        fontWeight = if (uiState.selectedTab == LibraryTab.BOOKSHELF) FontWeight.Bold else FontWeight.Normal
+                    )
+                }
+            )
+        }
+
+        // Tab Content
+        when (uiState.selectedTab) {
+            LibraryTab.HISTORY -> {
+                if (uiState.historyEntries.isEmpty()) {
+                    EmptyView(
+                        title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
+                        message = "Truyện bạn đã đọc sẽ xuất hiện tại đây"
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(uiState.historyEntries) { entry ->
+                            HistoryRowItem(
+                                entry = entry,
+                                onStoryClick = { onStoryClick(entry.story) },
+                                onContinueRead = {
+                                    onContinueRead(entry.story.id.value, entry.lastReadChapterId)
+                                }
                             )
                         }
                     }
                 }
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            // Tab Row
-            TabRow(
-                selectedTabIndex = uiState.selectedTab.ordinal,
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
-                Tab(
-                    selected = uiState.selectedTab == LibraryTab.HISTORY,
-                    onClick = { viewModel.selectTab(LibraryTab.HISTORY) },
-                    text = {
-                        Text(
-                            text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_TAB_HISTORY),
-                            fontWeight = if (uiState.selectedTab == LibraryTab.HISTORY) FontWeight.Bold else FontWeight.Normal
-                        )
-                    }
-                )
-                Tab(
-                    selected = uiState.selectedTab == LibraryTab.BOOKSHELF,
-                    onClick = { viewModel.selectTab(LibraryTab.BOOKSHELF) },
-                    text = {
-                        Text(
-                            text = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_TAB_FAVORITES),
-                            fontWeight = if (uiState.selectedTab == LibraryTab.BOOKSHELF) FontWeight.Bold else FontWeight.Normal
-                        )
-                    }
-                )
             }
-
-            // Tab Content
-            when (uiState.selectedTab) {
-                LibraryTab.HISTORY -> {
-                    if (uiState.historyEntries.isEmpty()) {
-                        EmptyView(
-                            title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
-                            message = "Truyện bạn đã đọc sẽ xuất hiện tại đây"
-                        )
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(uiState.historyEntries) { entry ->
-                                HistoryRowItem(
-                                    entry = entry,
-                                    onStoryClick = { onStoryClick(entry.story) },
-                                    onContinueRead = {
-                                        onContinueRead(entry.story.id.value, entry.lastReadChapterId)
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-                LibraryTab.BOOKSHELF -> {
-                    if (uiState.savedStories.isEmpty()) {
-                        EmptyView(
-                            title = com.slowbuild.storyverse.storyverse.theme.localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
-                            message = "Bạn chưa lưu truyện nào vào tủ sách"
-                        )
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            items(uiState.savedStories) { story ->
-                                StoryRowItem(
-                                    story = story,
-                                    onClick = { onStoryClick(story) }
-                                )
-                            }
+            LibraryTab.BOOKSHELF -> {
+                if (uiState.savedStories.isEmpty()) {
+                    EmptyView(
+                        title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
+                        message = "Bạn chưa lưu truyện nào vào tủ sách"
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(uiState.savedStories) { story ->
+                            StoryRowItem(
+                                story = story,
+                                onClick = { onStoryClick(story) }
+                            )
                         }
                     }
                 }
