@@ -11,6 +11,9 @@ interface ChapterContentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(content: ChapterContentEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdateAll(contents: List<ChapterContentEntity>)
+
     @Query("SELECT * FROM chapter_contents WHERE chapterId = :chapterId LIMIT 1")
     suspend fun getContentByChapterId(chapterId: String): ChapterContentEntity?
 

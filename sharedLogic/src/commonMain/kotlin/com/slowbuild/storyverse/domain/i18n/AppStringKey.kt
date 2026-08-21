@@ -52,6 +52,10 @@ enum class AppStringKey {
     DETAIL_IN_LIBRARY,
     DETAIL_DOWNLOAD,
     DETAIL_DOWNLOADED,
+    DETAIL_DOWNLOADING,          // "Đang tải {0}%"
+    DETAIL_DOWNLOAD_SUCCESS,     // "Tải truyện thành công!"
+    DETAIL_DOWNLOAD_FAILED,      // "Tải thất bại: {0}"
+    DETAIL_READING_NOW,          // "Đang đọc"
     DETAIL_DESCRIPTION_TITLE,
     DETAIL_CHAPTER_LIST_TITLE,
     DETAIL_LATEST_CHAPTER_FORMAT, // "Chương mới nhất: {0}"

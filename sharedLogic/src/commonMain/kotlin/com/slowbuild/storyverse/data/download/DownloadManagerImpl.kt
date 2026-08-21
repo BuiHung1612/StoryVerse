@@ -63,6 +63,19 @@ class DownloadManagerImpl(
         return getEpubDirectory() / "$safeName.epub"
     }
 
+    private fun sanitizeDownloadUrl(url: String): String {
+        return when {
+            url.contains("drive.google.com/uc?") && !url.contains("confirm=") -> {
+                "$url&confirm=t"
+            }
+            url.contains("drive.google.com/file/d/") -> {
+                val fileId = Regex("/file/d/([^/?]+)").find(url)?.groupValues?.get(1)
+                if (fileId != null) "https://drive.google.com/uc?export=download&id=$fileId&confirm=t" else url
+            }
+            else -> url
+        }
+    }
+
     override fun downloadStory(story: Story, downloadUrl: String): Flow<DownloadProgress> = flow {
         val storyId = story.id
         val targetPath = getEpubFilePath(storyId)
@@ -76,9 +89,14 @@ class DownloadManagerImpl(
         updateProgress(initialProgress)
 
         try {
-            AppLogger.i("DownloadManager") { "Starting download for '${story.title}' from $downloadUrl" }
+            val actualUrl = sanitizeDownloadUrl(downloadUrl)
+            AppLogger.i("DownloadManager") { "Starting download for '${story.title}' from $actualUrl" }
 
-            val response = httpClient.get(downloadUrl)
+            val response = httpClient.get(actualUrl)
+            if (response.status.value !in 200..299) {
+                throw Exception("Tải tệp thất bại: HTTP ${response.status.value} ${response.status.description}")
+            }
+
             val totalBytes = response.contentLength() ?: 0L
             val channel = response.bodyAsChannel()
 
@@ -89,19 +107,24 @@ class DownloadManagerImpl(
             var downloadedBytes = 0L
 
             while (!channel.isClosedForRead) {
-                val packet = channel.readRemaining(8192)
+                val packet = channel.readRemaining(16384)
                 while (!packet.exhausted()) {
                     val bytes = packet.readByteArray()
                     bufferedSink.write(bytes)
                     downloadedBytes += bytes.size
 
-                    val ratio = if (totalBytes > 0) (downloadedBytes.toFloat() / totalBytes).coerceIn(0f, 0.9f) else 0.5f
+                    val ratio = if (totalBytes > 0) {
+                        (downloadedBytes.toFloat() / totalBytes).coerceIn(0.05f, 0.90f)
+                    } else {
+                        (0.05f + (downloadedBytes.toFloat() / (2 * 1024 * 1024)).coerceIn(0f, 0.85f))
+                    }
+
                     val currentProgress = DownloadProgress(
                         storyId = storyId,
                         status = DownloadStatus.DOWNLOADING,
                         progress = ratio,
                         downloadedBytes = downloadedBytes,
-                        totalBytes = totalBytes
+                        totalBytes = if (totalBytes > 0) totalBytes else downloadedBytes
                     )
                     emit(currentProgress)
                     updateProgress(currentProgress)
@@ -109,6 +132,10 @@ class DownloadManagerImpl(
             }
             bufferedSink.flush()
             bufferedSink.close()
+
+            if (downloadedBytes == 0L) {
+                throw Exception("Tệp tải về rỗng (0 bytes). Vui lòng kiểm tra lại liên kết.")
+            }
 
             // 2. Parse EPUB into Chapters and ChapterContent
             emit(DownloadProgress(storyId = storyId, status = DownloadStatus.DOWNLOADING, progress = 0.95f))
@@ -149,7 +176,7 @@ class DownloadManagerImpl(
             // 3. Cache into Room database
             localStoryCache.cacheStory(story.copy(inLibrary = true, totalChapters = domainChapters.size))
             localStoryCache.cacheChapters(domainChapters)
-            domainContents.forEach { localStoryCache.cacheChapterContent(it) }
+            localStoryCache.cacheChapterContents(domainContents)
 
             // 4. Save Download Entity
             val downloadEntity = DownloadEntity(

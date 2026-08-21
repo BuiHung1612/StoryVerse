@@ -31,6 +31,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +55,7 @@ import coil.compose.AsyncImage
 import com.slowbuild.storyverse.domain.i18n.AppStringKey
 import com.slowbuild.storyverse.domain.i18n.AppStrings
 import com.slowbuild.storyverse.domain.model.Chapter
+import com.slowbuild.storyverse.domain.model.DownloadStatus
 import com.slowbuild.storyverse.storyverse.theme.localizedString
 import com.slowbuild.storyverse.storyverse.ui.common.ErrorView
 import com.slowbuild.storyverse.storyverse.ui.common.LoadingView
@@ -64,12 +70,37 @@ fun StoryDetailScreen(
     viewModel: StoryDetailViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(storyId) {
         viewModel.loadStory(storyId)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    // Show snackbar when download completes or fails
+    LaunchedEffect(uiState.downloadProgress?.status) {
+        val status = uiState.downloadProgress?.status ?: return@LaunchedEffect
+        when (status) {
+            DownloadStatus.COMPLETED -> snackbarHostState.showSnackbar(
+                AppStrings.get(AppStringKey.DETAIL_DOWNLOAD_SUCCESS)
+            )
+            DownloadStatus.FAILED -> snackbarHostState.showSnackbar(
+                AppStrings.get(
+                    AppStringKey.DETAIL_DOWNLOAD_FAILED,
+                    uiState.downloadProgress?.errorMessage ?: AppStrings.get(AppStringKey.ERROR_UNKNOWN)
+                )
+            )
+            else -> Unit
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(snackbarData = data)
+            }
+        }
+    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
         StoryVerseTopBar(
             title = uiState.story?.title ?: localizedString(AppStringKey.APP_NAME),
             canNavigateBack = true,
@@ -227,7 +258,7 @@ fun StoryDetailScreen(
 
                         // Download Action Button
                         val dl = uiState.downloadProgress
-                        val isDownloading = dl != null && dl.status == com.slowbuild.storyverse.domain.model.DownloadStatus.DOWNLOADING
+                        val isDownloading = dl != null && dl.status == DownloadStatus.DOWNLOADING
 
                         OutlinedButton(
                             onClick = { viewModel.startDownload() },
@@ -241,7 +272,13 @@ fun StoryDetailScreen(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "${(dl!!.progress * 100).toInt()}%", fontSize = 12.sp)
+                                Text(
+                                    text = localizedString(
+                                        AppStringKey.DETAIL_DOWNLOADING,
+                                        (dl.progress * 100).toInt()
+                                    ),
+                                    fontSize = 12.sp
+                                )
                             } else if (uiState.isDownloaded) {
                                 Icon(
                                     imageVector = Icons.Default.Check,
@@ -250,7 +287,7 @@ fun StoryDetailScreen(
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "Đã tải", fontSize = 12.sp)
+                                Text(text = localizedString(AppStringKey.DETAIL_DOWNLOADED), fontSize = 12.sp)
                             } else {
                                 Icon(
                                     imageVector = Icons.Default.ArrowDownward,
@@ -258,7 +295,7 @@ fun StoryDetailScreen(
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "Tải về", fontSize = 12.sp)
+                                Text(text = localizedString(AppStringKey.DETAIL_DOWNLOAD), fontSize = 12.sp)
                             }
                         }
                     }
@@ -347,9 +384,10 @@ fun StoryDetailScreen(
                 }
             }
         }
-    }
-}
-}
+    }   // end when
+    }   // end Column
+    }   // end Scaffold
+}       // end StoryDetailScreen
 
 @Composable
 fun ChapterItem(
@@ -389,7 +427,7 @@ fun ChapterItem(
 
             if (isCurrentReading) {
                 Text(
-                    text = "Đang đọc",
+                    text = localizedString(AppStringKey.DETAIL_READING_NOW),
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium

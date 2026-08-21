@@ -38,6 +38,12 @@ class LocalStoryCache(
         chapterContentDao.insertOrUpdate(ChapterContentEntity.fromDomain(content, cachedAt))
     }
 
+    suspend fun cacheChapterContents(contents: List<ChapterContent>, cachedAt: Long = 0L) {
+        if (contents.isNotEmpty()) {
+            chapterContentDao.insertOrUpdateAll(contents.map { ChapterContentEntity.fromDomain(it, cachedAt) })
+        }
+    }
+
     suspend fun getCachedChapterContent(chapterId: String): ChapterContent? {
         return chapterContentDao.getContentByChapterId(chapterId)?.toDomain()
     }

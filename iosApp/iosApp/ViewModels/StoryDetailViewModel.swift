@@ -12,6 +12,8 @@ public final class StoryDetailViewModel: ObservableObject {
     @Published public private(set) var readingProgress: ReadingProgress? = nil
     @Published public private(set) var isLoading: Bool = false
     @Published public private(set) var errorMessage: String? = nil
+    @Published public var downloadErrorMessage: String? = nil
+    @Published public var downloadSuccessMessage: String? = nil
 
     private let storySourceRegistry: StorySourceRegistry
     private let readerRepository: ReaderRepository
@@ -78,6 +80,8 @@ public final class StoryDetailViewModel: ObservableObject {
 
         isDownloading = true
         downloadProgress = 0.05
+        downloadErrorMessage = nil
+        downloadSuccessMessage = nil
 
         Task {
             do {
@@ -88,17 +92,22 @@ public final class StoryDetailViewModel: ObservableObject {
                             self.isDownloading = false
                             self.isDownloaded = true
                             self.isInLibrary = true
+                            self.downloadSuccessMessage = "Đã tải xong toàn bộ tác phẩm!"
                             let parsedStoryId = StoryId.companion.from(compositeValue: storyDetail.story.id.value)
                             if let reloaded = try? await self.localCache.getCachedChapters(storyId: parsedStoryId) {
                                 self.chapters = reloaded
                             }
                         } else if progress.status == .failed {
                             self.isDownloading = false
+                            self.downloadErrorMessage = progress.errorMessage ?? "Tải truyện thất bại. Vui lòng thử lại."
                         }
                     }
                 }
             } catch {
-                self.isDownloading = false
+                Task { @MainActor in
+                    self.isDownloading = false
+                    self.downloadErrorMessage = error.localizedDescription
+                }
             }
         }
     }
