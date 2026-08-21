@@ -2,6 +2,7 @@ package com.slowbuild.storyverse.di
 
 import com.slowbuild.storyverse.data.local.LocalStoryCache
 import com.slowbuild.storyverse.domain.i18n.LocalizationRepository
+import com.slowbuild.storyverse.domain.reader.ReaderPreferencesRepository
 import com.slowbuild.storyverse.domain.repository.ReaderRepository
 import com.slowbuild.storyverse.domain.source.StorySourceRegistry
 import com.slowbuild.storyverse.domain.theme.ThemeRepository
@@ -16,4 +17,5 @@ class KoinHelper : KoinComponent {
     val readerRepository: ReaderRepository by inject()
     val localStoryCache: LocalStoryCache by inject()
     val readerUseCase: ReaderUseCase by inject()
+    val readerPreferencesRepository: ReaderPreferencesRepository by inject()
 }

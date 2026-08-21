@@ -17,6 +17,10 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+import com.slowbuild.storyverse.data.reader.ReaderPreferencesRepositoryImpl
+import com.slowbuild.storyverse.domain.reader.ReaderFontFamily
+import com.slowbuild.storyverse.domain.reader.ReaderThemePreset
+
 class ReaderUseCaseTest {
 
     private lateinit var database: StoryVerseDatabase
@@ -36,11 +40,13 @@ class ReaderUseCaseTest {
             historyDao = database.historyDao()
         )
         val registry = StorySourceRegistryImpl(listOf(StubStorySource()))
+        val prefsRepo = ReaderPreferencesRepositoryImpl()
 
         readerUseCase = ReaderUseCase(
             storySourceRegistry = registry,
             localStoryCache = localCache,
-            readerRepository = readerRepo
+            readerRepository = readerRepo,
+            readerPreferencesRepository = prefsRepo
         )
     }
 
@@ -91,5 +97,22 @@ class ReaderUseCaseTest {
 
         bookmarks = readerUseCase.observeBookmarks(storyId).first()
         assertEquals(0, bookmarks.size)
+    }
+
+    @Test
+    fun readerUseCase_updates_and_observes_preferences() = runTest {
+        assertEquals(17f, readerUseCase.preferences.value.fontSize)
+
+        readerUseCase.setFontSize(22f)
+        assertEquals(22f, readerUseCase.preferences.value.fontSize)
+
+        readerUseCase.setThemePreset(ReaderThemePreset.SEPIA)
+        assertEquals(ReaderThemePreset.SEPIA, readerUseCase.preferences.value.themePreset)
+
+        readerUseCase.setFontFamily(ReaderFontFamily.SERIF)
+        assertEquals(ReaderFontFamily.SERIF, readerUseCase.preferences.value.fontFamily)
+
+        readerUseCase.setLineSpacing(1.8f)
+        assertEquals(1.8f, readerUseCase.preferences.value.lineSpacingMultiplier)
     }
 }

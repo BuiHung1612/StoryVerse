@@ -12,16 +12,28 @@ public final class ReaderViewModel: ObservableObject {
     @Published public private(set) var wordCount: Int32 = 0
     @Published public private(set) var estimatedReadMinutes: Int32 = 1
     @Published public private(set) var isBookmarked: Bool = false
+    @Published public private(set) var bookmarks: [Bookmark] = []
+    
+    // Preferences
+    @Published public var fontSize: CGFloat = 17
+    @Published public var fontFamily: ReaderFontFamily = .system
+    @Published public var lineSpacingMultiplier: CGFloat = 1.55
+    @Published public var themePreset: ReaderThemePreset = .default_
+    @Published public var horizontalPadding: CGFloat = 20
+    
+    // Sheet States
     @Published public var showTocSheet: Bool = false
-    @Published public var fontSize: CGFloat = 18
+    @Published public var showSettingsSheet: Bool = false
+    @Published public var showBookmarksSheet: Bool = false
     @Published public var showControls: Bool = true
+    
     @Published public private(set) var isLoading: Bool = false
     @Published public private(set) var errorMessage: String? = nil
 
     private let readerUseCase: ReaderUseCase
-
     private var currentStoryId: String = ""
     private var currentChapterId: String = ""
+    private var progressTask: Task<Void, Never>? = nil
 
     public init(
         readerUseCase: ReaderUseCase = KoinHelper().readerUseCase
@@ -79,20 +91,86 @@ public final class ReaderViewModel: ObservableObject {
         }
     }
 
+    public func deleteBookmark(id: String) {
+        Task {
+            _ = try? await readerUseCase.deleteBookmark(bookmarkId: id)
+            bookmarks.removeAll(where: { $0.id == id })
+        }
+    }
+
+    public func onScrollPositionChanged(scrollOffset: Int32, progress: Float) {
+        guard !currentStoryId.isEmpty, let currentChapter = chapters.first(where: { $0.id == currentChapterId }) else { return }
+        let parsedStoryId = StoryId.companion.from(compositeValue: currentStoryId)
+
+        progressTask?.cancel()
+        progressTask = Task {
+            try? await Task.sleep(nanoseconds: 500_000_000) // 500ms debounce
+            _ = try? await readerUseCase.saveScrollPosition(
+                storyId: parsedStoryId,
+                chapterId: currentChapter.id,
+                chapterIndex: currentChapter.index,
+                scrollOffset: scrollOffset,
+                progressPercentage: progress
+            )
+        }
+    }
+
     public func toggleTocSheet() {
         showTocSheet.toggle()
+        if showTocSheet {
+            showSettingsSheet = false
+            showBookmarksSheet = false
+        }
+    }
+
+    public func toggleSettingsSheet() {
+        showSettingsSheet.toggle()
+        if showSettingsSheet {
+            showTocSheet = false
+            showBookmarksSheet = false
+        }
+    }
+
+    public func toggleBookmarksSheet() {
+        showBookmarksSheet.toggle()
+        if showBookmarksSheet {
+            showTocSheet = false
+            showSettingsSheet = false
+        }
     }
 
     public func increaseFontSize() {
         if fontSize < 32 {
-            fontSize += 2
+            fontSize += 1.5
+            readerUseCase.setFontSize(size: Float(fontSize))
         }
     }
 
     public func decreaseFontSize() {
         if fontSize > 12 {
-            fontSize -= 2
+            fontSize -= 1.5
+            readerUseCase.setFontSize(size: Float(fontSize))
         }
+    }
+
+    public func setFontSize(_ size: CGFloat) {
+        self.fontSize = max(12, min(32, size))
+        readerUseCase.setFontSize(size: Float(self.fontSize))
+    }
+
+    public func setFontFamily(_ family: ReaderFontFamily) {
+        self.fontFamily = family
+        readerUseCase.setFontFamily(fontFamily: family)
+    }
+
+    public func setLineSpacing(_ multiplier: CGFloat) {
+        self.lineSpacingMultiplier = multiplier
+        readerUseCase.setLineSpacing(multiplier: Float(multiplier))
+    }
+
+    public func setThemePreset(_ preset: ReaderThemePreset) {
+        self.themePreset = preset
+        readerUseCase.setThemePreset(preset: preset)
     }
 
     public func toggleControls() {

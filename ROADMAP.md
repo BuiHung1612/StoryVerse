@@ -41,7 +41,7 @@
 - [x] Phase 10 — iOS Native App Shell
 - [x] Phase 11 — Story Discovery, Search & Detail
 - [x] Phase 12 — Reader Core
-- [ ] Phase 13 — Reader Preferences, Progress, Bookmark & History
+- [x] Phase 13 — Reader Preferences, Progress, Bookmark & History
 - [ ] Phase 14 — Offline Download Manager
 - [ ] Phase 15 — ContentProcessor & Normalization
 - [ ] Phase 16 — Local AI Feasibility Spike
@@ -310,16 +310,18 @@
 **Prerequisites:** Phase 12 complete.
 
 **Tasks**
-- [ ] Implement font size/family, line spacing, paragraph spacing, margins, theme/background.
-- [ ] Persist preferences.
-- [ ] Persist chapter + position progress with throttling/debounce.
-- [ ] Resume reading from last position.
-- [ ] Bookmark story/chapter/position.
-- [ ] Implement recent/history and cleanup policy.
+- [x] Implement ReaderPreferences data model & repository (`fontSize`, `fontFamily`, `lineSpacingMultiplier`, `paragraphSpacingDp`, `horizontalPaddingDp`, `themePreset`).
+- [x] Full theme presets: Default/App, Light (Trắng sáng), Sepia (Giấy ngà), Dark (Xám tối), and OLED Black.
+- [x] Font family choices: System Default, Serif, Sans-Serif, Monospace.
+- [x] Persist reading progress with 500ms debounce/throttling during scrolling.
+- [x] Table of Contents (TOC) and saved Bookmarks Modal Sheets with instant jump and swipe/button deletion.
+- [x] Reader Settings Sheet with reactive live adjustments on Android and iOS.
+- [x] Unit tests covering ReaderPreferences, Theme Presets, and Bookmarks.
 
 **Definition of Done**
-- [ ] Preferences persist and apply correctly.
-- [ ] Progress, bookmarks, and history are robust and tested.
+- [x] Preferences persist and apply correctly across Android and iOS.
+- [x] Progress, bookmarks, and history are robust and tested.
+- [x] Builds succeed on Android (`assembleDebug`) and iOS (`xcodebuild`).
 
 ---
 

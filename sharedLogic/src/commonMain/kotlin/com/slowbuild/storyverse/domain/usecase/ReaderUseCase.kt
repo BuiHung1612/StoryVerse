@@ -14,10 +14,15 @@ import com.slowbuild.storyverse.domain.model.Story
 import com.slowbuild.storyverse.domain.model.StoryId
 import com.slowbuild.storyverse.domain.repository.ReaderRepository
 import com.slowbuild.storyverse.domain.source.StorySourceRegistry
+import com.slowbuild.storyverse.domain.reader.ReaderFontFamily
+import com.slowbuild.storyverse.domain.reader.ReaderPreferences
+import com.slowbuild.storyverse.domain.reader.ReaderPreferencesRepository
+import com.slowbuild.storyverse.domain.reader.ReaderThemePreset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
@@ -35,8 +40,23 @@ data class ReaderSessionData(
 class ReaderUseCase(
     private val storySourceRegistry: StorySourceRegistry,
     private val localStoryCache: LocalStoryCache,
-    private val readerRepository: ReaderRepository
+    private val readerRepository: ReaderRepository,
+    private val readerPreferencesRepository: ReaderPreferencesRepository
 ) {
+    val preferences: StateFlow<ReaderPreferences> = readerPreferencesRepository.preferences
+
+    fun updatePreferences(transform: (ReaderPreferences) -> ReaderPreferences) =
+        readerPreferencesRepository.updatePreferences(transform)
+
+    fun setFontSize(size: Float) = readerPreferencesRepository.setFontSize(size)
+    fun setFontFamily(fontFamily: ReaderFontFamily) = readerPreferencesRepository.setFontFamily(fontFamily)
+    fun setLineSpacing(multiplier: Float) = readerPreferencesRepository.setLineSpacing(multiplier)
+    fun setThemePreset(preset: ReaderThemePreset) = readerPreferencesRepository.setThemePreset(preset)
+    fun setHorizontalPadding(paddingDp: Float) = readerPreferencesRepository.setHorizontalPadding(paddingDp)
+
+    fun observeHistory(limit: Int = 50): Flow<List<HistoryEntry>> = readerRepository.observeHistory(limit)
+    suspend fun clearHistory(): AppResult<Unit> = readerRepository.clearHistory()
+    suspend fun deleteBookmark(bookmarkId: String): AppResult<Unit> = readerRepository.removeBookmark(bookmarkId)
     suspend fun loadChapterSession(
         storyId: StoryId,
         chapterId: String,

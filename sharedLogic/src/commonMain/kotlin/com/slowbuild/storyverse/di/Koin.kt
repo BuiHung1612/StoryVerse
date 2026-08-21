@@ -23,16 +23,26 @@ import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
+import com.slowbuild.storyverse.data.reader.ReaderPreferencesRepositoryImpl
+import com.slowbuild.storyverse.domain.reader.ReaderPreferencesRepository
 import com.slowbuild.storyverse.domain.usecase.ReaderUseCase
 
 val coreModule = module {
     single<DispatcherProvider> { DefaultDispatcherProvider() }
     single<LocalizationRepository> { LocalizationRepositoryImpl() }
     single<ThemeRepository> { ThemeRepositoryImpl() }
+    single<ReaderPreferencesRepository> { ReaderPreferencesRepositoryImpl() }
 }
 
 val domainModule = module {
-    single { ReaderUseCase(storySourceRegistry = get(), localStoryCache = get(), readerRepository = get()) }
+    single {
+        ReaderUseCase(
+            storySourceRegistry = get(),
+            localStoryCache = get(),
+            readerRepository = get(),
+            readerPreferencesRepository = get()
+        )
+    }
 }
 
 val dataModule = module {
