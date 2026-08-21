@@ -18,6 +18,9 @@ interface StoryDao {
     @Query("SELECT * FROM stories WHERE storyId = :storyId LIMIT 1")
     suspend fun getStoryById(storyId: String): StoryEntity?
 
+    @Query("SELECT * FROM stories WHERE inLibrary = 1 ORDER BY lastAccessedAt DESC")
+    fun observeLibraryStories(): Flow<List<StoryEntity>>
+
     @Query("SELECT * FROM stories ORDER BY lastAccessedAt DESC")
     fun observeAllStories(): Flow<List<StoryEntity>>
 

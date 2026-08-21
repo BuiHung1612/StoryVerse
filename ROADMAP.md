@@ -37,7 +37,7 @@
 - [x] Phase 6 — Design System & Multi-Theme Architecture
 - [x] Phase 7 — First Real Story Source
 - [x] Phase 8 — Room KMP Persistence
-- [ ] Phase 9 — Android Native App Shell
+- [x] Phase 9 — Android Native App Shell
 - [ ] Phase 10 — iOS Native App Shell
 - [ ] Phase 11 — Story Discovery, Search & Detail
 - [ ] Phase 12 — Reader Core
@@ -224,15 +224,15 @@
 **Prerequisites:** Phase 8 complete.
 
 **Tasks**
-- [ ] Implement navigation graph: Home, Search, Library, Story Detail, Reader, Settings.
-- [ ] Connect Jetpack Compose theme to multi-theme system.
-- [ ] Connect ViewModels to StateFlow and lifecycle.
-- [ ] Inject dependencies with Koin and integrate shared repositories.
-- [ ] Handle loading/error/empty states in UI.
+- [x] Implement navigation graph: Home, Search, Library, Story Detail, Reader, Settings with BottomNavigationBar.
+- [x] Connect Jetpack Compose theme to multi-theme system (`StoryVerseTheme`, dynamic swatches).
+- [x] Connect ViewModels to StateFlow, lifecycle, and shared domain models.
+- [x] Inject dependencies with Koin and integrate shared repositories and Room DAOs.
+- [x] Handle loading, error (with retry), and empty states in UI.
 
 **Definition of Done**
-- [ ] All main screens are navigable and display stub data.
-- [ ] State management and dependency injection are functional.
+- [x] All main screens are navigable and display live real/catalog data.
+- [x] State management and dependency injection are functional.
 
 ---
 
