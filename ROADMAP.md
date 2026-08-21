@@ -36,7 +36,7 @@
 - [x] Phase 5 — Multi-Language & Unified Localization (i18n)
 - [x] Phase 6 — Design System & Multi-Theme Architecture
 - [x] Phase 7 — First Real Story Source
-- [ ] Phase 8 — Room KMP Persistence
+- [x] Phase 8 — Room KMP Persistence
 - [ ] Phase 9 — Android Native App Shell
 - [ ] Phase 10 — iOS Native App Shell
 - [ ] Phase 11 — Story Discovery, Search & Detail
@@ -201,20 +201,20 @@
 ---
 
 ### Phase 8 — Room KMP Persistence
-**Goal:** Provide robust local persistence on both platforms.
+**Goal:** Implement cross-platform local database persistence using Room KMP with SQLite driver.
 
 **Prerequisites:** Phase 7 complete.
 
 **Tasks**
-- [ ] Configure Room for Android and iOS.
-- [ ] Define entities/DAOs for stories, chapter metadata, chapter content, reading progress, bookmarks, history, downloads, source metadata.
-- [ ] Ensure queries avoid loading all chapter bodies when querying library/story metadata.
-- [ ] Implement repository cache policy and migrations.
-- [ ] Write database tests.
+- [x] Configure Room KMP (`androidx.room` 2.7.2 + `androidx.sqlite:sqlite-bundled` 2.6.0) with KSP multiplatform code generator.
+- [x] Define entities/DAOs for stories, chapter metadata, chapter content, reading progress, bookmarks, history, downloads.
+- [x] Ensure queries avoid loading all chapter bodies when querying library/story metadata (normalized `ChapterContentDao` separation).
+- [x] Implement repository cache policy (`LocalStoryCache`, `RoomReaderRepository`).
+- [x] Write database tests for all DAOs and repositories with 100% pass on Android & iOS simulator.
 
 **Definition of Done**
-- [ ] Data persists and loads correctly on both platforms.
-- [ ] Migration and cache policy are tested.
+- [x] Data persists and loads correctly on both platforms.
+- [x] Migration and cache policy are tested.
 
 ---
 

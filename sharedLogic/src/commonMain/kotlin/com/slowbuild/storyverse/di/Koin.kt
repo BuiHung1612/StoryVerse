@@ -3,13 +3,17 @@ package com.slowbuild.storyverse.di
 import com.slowbuild.storyverse.core.dispatcher.DefaultDispatcherProvider
 import com.slowbuild.storyverse.core.dispatcher.DispatcherProvider
 import com.slowbuild.storyverse.data.i18n.LocalizationRepositoryImpl
+import com.slowbuild.storyverse.data.local.LocalStoryCache
+import com.slowbuild.storyverse.data.local.room.StoryVerseDatabase
 import com.slowbuild.storyverse.data.network.client.HttpClientFactory
+import com.slowbuild.storyverse.data.repository.RoomReaderRepository
 import com.slowbuild.storyverse.data.source.StorySourceRegistryImpl
 import com.slowbuild.storyverse.data.source.catalog.DriveCatalogStorySource
 import com.slowbuild.storyverse.data.source.stub.StubStorySource
 import com.slowbuild.storyverse.data.theme.ThemeRepositoryImpl
 import com.slowbuild.storyverse.domain.i18n.AppStrings
 import com.slowbuild.storyverse.domain.i18n.LocalizationRepository
+import com.slowbuild.storyverse.domain.repository.ReaderRepository
 import com.slowbuild.storyverse.domain.source.StorySourceRegistry
 import com.slowbuild.storyverse.domain.theme.AppTheme
 import com.slowbuild.storyverse.domain.theme.ThemeRepository
@@ -38,6 +42,23 @@ val dataModule = module {
                 get<DriveCatalogStorySource>(),
                 StubStorySource()
             )
+        )
+    }
+
+    // Room DAOs & Local Persistence
+    single { get<StoryVerseDatabase>().storyDao() }
+    single { get<StoryVerseDatabase>().chapterDao() }
+    single { get<StoryVerseDatabase>().chapterContentDao() }
+    single { get<StoryVerseDatabase>().readingProgressDao() }
+    single { get<StoryVerseDatabase>().bookmarkDao() }
+    single { get<StoryVerseDatabase>().historyDao() }
+    single { get<StoryVerseDatabase>().downloadDao() }
+    single { LocalStoryCache(storyDao = get(), chapterDao = get(), chapterContentDao = get()) }
+    single<ReaderRepository> {
+        RoomReaderRepository(
+            readingProgressDao = get(),
+            bookmarkDao = get(),
+            historyDao = get()
         )
     }
 }
