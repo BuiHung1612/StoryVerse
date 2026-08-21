@@ -2,7 +2,7 @@ package com.slowbuild.storyverse.storyverse.theme
 
 import android.app.Activity
 import android.graphics.drawable.ColorDrawable
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.ColorScheme
@@ -146,24 +146,15 @@ fun StoryVerseTheme(
         currentColors
     }
 
-    // Smoothly animate the background colour when the theme changes.
-    // This prevents the "header flash old color" artifact.
-    val targetBackground = Color(activeColors.background.toInt())
-    val animatedBackground by animateColorAsState(
-        targetValue = targetBackground,
-        animationSpec = tween(durationMillis = 300, easing = EaseInOut),
-        label = "themeBackground"
-    )
-
-    // Update the native window background to match animated color so no flash appears
-    // above/below the Compose layer during theme transitions.
+    // Sync the native window background immediately whenever theme changes.
+    // This ensures the area behind Compose (status bar, nav bar) matches before
+    // any recomposition, eliminating the "old color flash" artifact.
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
-                // Keep native window bg in sync → eliminates the "old color" flash on TopBar
-                window.setBackgroundDrawable(ColorDrawable(animatedBackground.toArgb()))
+                window.setBackgroundDrawable(ColorDrawable(Color(activeColors.background.toInt()).toArgb()))
                 val insetsController = WindowCompat.getInsetsController(window, view)
                 insetsController.isAppearanceLightStatusBars = !activeColors.isDark
                 insetsController.isAppearanceLightNavigationBars = !activeColors.isDark
@@ -171,14 +162,23 @@ fun StoryVerseTheme(
         }
     }
 
-    CompositionLocalProvider(
-        LocalStoryVerseColors provides activeColors,
-        LocalAppLanguage provides currentLanguage
-    ) {
-        MaterialTheme(
-            colorScheme = activeColors.toMaterialColorScheme(),
-            content = content
-        )
+    // Use Crossfade to animate the entire UI subtree when the theme preset changes.
+    // This ensures ALL composables (TopBar, content, nav bar) transition simultaneously
+    // to the new theme colors — no partial flash where some components lag behind.
+    Crossfade(
+        targetState = activeColors,
+        animationSpec = tween(durationMillis = 350, easing = EaseInOut),
+        label = "themeTransition"
+    ) { colors ->
+        CompositionLocalProvider(
+            LocalStoryVerseColors provides colors,
+            LocalAppLanguage provides currentLanguage
+        ) {
+            MaterialTheme(
+                colorScheme = colors.toMaterialColorScheme(),
+                content = content
+            )
+        }
     }
 }
 
