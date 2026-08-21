@@ -267,8 +267,9 @@ class DriveCatalogStorySource(
         val loadResult = ensureCatalogLoaded()
         if (loadResult is AppResult.Error) return loadResult
 
+        val cleanRawId = if (rawId.contains("::")) rawId.substringAfter("::") else rawId
         val items = (loadResult as AppResult.Success).data
-        val item = items.firstOrNull { it.id == rawId }
+        val item = items.firstOrNull { it.id == cleanRawId || it.id == rawId }
             ?: return AppResult.Error(AppError.Source("Không tìm thấy truyện trong kho sưu tầm (ID: $rawId)", sourceId = metadata.id))
 
         val storyId = StoryId.create(metadata.id, item.id)
@@ -304,7 +305,8 @@ class DriveCatalogStorySource(
     }
 
     override suspend fun getChapterContent(chapterId: String): AppResult<ChapterContent> {
-        val rawStoryId = chapterId.substringBefore("_")
+        val cleanChapterId = if (chapterId.contains("::")) chapterId.substringAfter("::") else chapterId
+        val rawStoryId = cleanChapterId.substringBefore("_")
         val detailResult = getStoryDetail(rawStoryId)
         if (detailResult is AppResult.Error) return detailResult
 

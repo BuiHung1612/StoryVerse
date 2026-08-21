@@ -25,7 +25,9 @@ public final class StoryDetailViewModel: ObservableObject {
     }
 
     public func loadStory(storyId: String) {
-        guard let source = storySourceRegistry.getDefaultSource() else {
+        let parsedStoryId = StoryId.companion.from(compositeValue: storyId)
+        let source = storySourceRegistry.getSource(sourceId: parsedStoryId.sourceId) ?? storySourceRegistry.getDefaultSource()
+        guard let source = source else {
             self.errorMessage = "No active story source."
             return
         }
@@ -35,7 +37,7 @@ public final class StoryDetailViewModel: ObservableObject {
 
         Task {
             do {
-                let detailResult = try await source.getStoryDetail(rawId: storyId)
+                let detailResult = try await source.getStoryDetail(rawId: parsedStoryId.rawId)
                 if let detail = detailResult.getOrNull() as? StoryDetail {
                     self.story = detail
                     // Cache story
@@ -44,7 +46,7 @@ public final class StoryDetailViewModel: ObservableObject {
                     self.errorMessage = err.message
                 }
 
-                let chaptersResult = try await source.getChapterList(rawId: storyId)
+                let chaptersResult = try await source.getChapterList(rawId: parsedStoryId.rawId)
                 if let chapterList = chaptersResult.getOrNull() as? [Chapter] {
                     self.chapters = chapterList
                     try? await localCache.cacheChapters(chapters: chapterList)
