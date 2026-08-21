@@ -46,9 +46,16 @@ import com.slowbuild.storyverse.domain.i18n.AppStrings
 import com.slowbuild.storyverse.domain.model.HistoryEntry
 import com.slowbuild.storyverse.domain.model.Story
 import com.slowbuild.storyverse.storyverse.theme.localizedString
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import com.slowbuild.storyverse.storyverse.ui.common.EmptyView
 import com.slowbuild.storyverse.storyverse.ui.common.StoryRowItem
 import com.slowbuild.storyverse.storyverse.ui.common.StoryVerseTopBar
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -58,6 +65,21 @@ fun LibraryScreen(
     viewModel: LibraryViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(
+        initialPage = uiState.selectedTab.ordinal,
+        pageCount = { LibraryTab.entries.size }
+    )
+
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.selectTab(LibraryTab.entries[pagerState.currentPage])
+    }
+
+    LaunchedEffect(uiState.selectedTab) {
+        if (pagerState.currentPage != uiState.selectedTab.ordinal) {
+            pagerState.animateScrollToPage(uiState.selectedTab.ordinal)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -79,94 +101,100 @@ fun LibraryScreen(
 
         // Tab Row
         TabRow(
-            selectedTabIndex = uiState.selectedTab.ordinal,
+            selectedTabIndex = pagerState.currentPage,
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.primary
+            contentColor = MaterialTheme.colorScheme.primary,
+            indicator = { tabPositions ->
+                if (pagerState.currentPage < tabPositions.size) {
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
         ) {
-            Tab(
-                selected = uiState.selectedTab == LibraryTab.BOOKSHELF,
-                onClick = { viewModel.selectTab(LibraryTab.BOOKSHELF) },
-                text = {
-                    Text(
-                        text = localizedString(AppStringKey.LIBRARY_TAB_FAVORITES),
-                        fontWeight = if (uiState.selectedTab == LibraryTab.BOOKSHELF) FontWeight.Bold else FontWeight.Normal
-                    )
+            LibraryTab.entries.forEachIndexed { index, tab ->
+                val titleKey = when (tab) {
+                    LibraryTab.BOOKSHELF -> AppStringKey.LIBRARY_TAB_FAVORITES
+                    LibraryTab.HISTORY -> AppStringKey.LIBRARY_TAB_HISTORY
+                    LibraryTab.DOWNLOADS -> AppStringKey.LIBRARY_TAB_DOWNLOADS
                 }
-            )
-            Tab(
-                selected = uiState.selectedTab == LibraryTab.HISTORY,
-                onClick = { viewModel.selectTab(LibraryTab.HISTORY) },
-                text = {
-                    Text(
-                        text = localizedString(AppStringKey.LIBRARY_TAB_HISTORY),
-                        fontWeight = if (uiState.selectedTab == LibraryTab.HISTORY) FontWeight.Bold else FontWeight.Normal
-                    )
-                }
-            )
-            Tab(
-                selected = uiState.selectedTab == LibraryTab.DOWNLOADS,
-                onClick = { viewModel.selectTab(LibraryTab.DOWNLOADS) },
-                text = {
-                    Text(
-                        text = localizedString(AppStringKey.LIBRARY_TAB_DOWNLOADS),
-                        fontWeight = if (uiState.selectedTab == LibraryTab.DOWNLOADS) FontWeight.Bold else FontWeight.Normal
-                    )
-                }
-            )
+                Tab(
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                    text = {
+                        Text(
+                            text = localizedString(titleKey),
+                            fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
+                )
+            }
         }
 
-        // Tab Content
-        when (uiState.selectedTab) {
-            LibraryTab.BOOKSHELF -> {
-                if (uiState.savedStories.isEmpty()) {
+        // Swipeable Tab Content
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) { page ->
+            when (LibraryTab.entries[page]) {
+                LibraryTab.BOOKSHELF -> {
+                    if (uiState.savedStories.isEmpty()) {
+                        EmptyView(
+                            title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
+                            message = localizedString(AppStringKey.LIBRARY_EMPTY_SUBTITLE)
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(uiState.savedStories) { story ->
+                                StoryRowItem(
+                                    story = story,
+                                    onClick = { onStoryClick(story) }
+                                )
+                            }
+                        }
+                    }
+                }
+                LibraryTab.HISTORY -> {
+                    if (uiState.historyEntries.isEmpty()) {
+                        EmptyView(
+                            title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
+                            message = localizedString(AppStringKey.LIBRARY_EMPTY_SUBTITLE)
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(uiState.historyEntries) { entry ->
+                                HistoryRowItem(
+                                    entry = entry,
+                                    onStoryClick = { onStoryClick(entry.story) },
+                                    onContinueRead = {
+                                        onContinueRead(entry.story.id.value, entry.lastReadChapterId)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+                LibraryTab.DOWNLOADS -> {
                     EmptyView(
                         title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
                         message = localizedString(AppStringKey.LIBRARY_EMPTY_SUBTITLE)
                     )
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(uiState.savedStories) { story ->
-                            StoryRowItem(
-                                story = story,
-                                onClick = { onStoryClick(story) }
-                            )
-                        }
-                    }
                 }
-            }
-            LibraryTab.HISTORY -> {
-                if (uiState.historyEntries.isEmpty()) {
-                    EmptyView(
-                        title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
-                        message = localizedString(AppStringKey.LIBRARY_EMPTY_SUBTITLE)
-                    )
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(uiState.historyEntries) { entry ->
-                            HistoryRowItem(
-                                entry = entry,
-                                onStoryClick = { onStoryClick(entry.story) },
-                                onContinueRead = {
-                                    onContinueRead(entry.story.id.value, entry.lastReadChapterId)
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-            LibraryTab.DOWNLOADS -> {
-                EmptyView(
-                    title = localizedString(AppStringKey.LIBRARY_EMPTY_TITLE),
-                    message = localizedString(AppStringKey.LIBRARY_EMPTY_SUBTITLE)
-                )
             }
         }
     }

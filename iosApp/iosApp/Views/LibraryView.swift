@@ -26,7 +26,11 @@ public struct LibraryView: View {
                 // Tab Selector
                 HStack(spacing: 0) {
                     ForEach(LibraryTab.allCases) { tab in
-                        Button(action: { viewModel.selectedTab = tab }) {
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                viewModel.selectedTab = tab
+                            }
+                        }) {
                             VStack(spacing: 6) {
                                 Text(tab.title)
                                     .font(.system(size: 14, weight: viewModel.selectedTab == tab ? .bold : .medium))
@@ -43,46 +47,56 @@ public struct LibraryView: View {
                 .padding(.top, 8)
                 .background(themeManager.colors.background)
 
-                // Tab Content
+                // Swipeable Tab Content
                 if viewModel.isLoading && viewModel.savedStories.isEmpty {
                     LoadingView()
                 } else {
-                    switch viewModel.selectedTab {
-                    case .saved:
-                        if viewModel.savedStories.isEmpty {
-                            EmptyView(message: localizedString(AppStringKey.libraryEmptySubtitle), iconName: "bookmark")
-                        } else {
-                            ScrollView {
-                                LazyVStack(spacing: 10) {
-                                    ForEach(viewModel.savedStories, id: \.id.value) { story in
-                                        StoryRowItem(story: story) {
-                                            selectedStoryId = story.id.value
+                    TabView(selection: $viewModel.selectedTab) {
+                        // 1. Saved Stories Tab
+                        Group {
+                            if viewModel.savedStories.isEmpty {
+                                EmptyView(message: localizedString(AppStringKey.libraryEmptySubtitle), iconName: "bookmark")
+                            } else {
+                                ScrollView {
+                                    LazyVStack(spacing: 10) {
+                                        ForEach(viewModel.savedStories, id: \.id.value) { story in
+                                            StoryRowItem(story: story) {
+                                                selectedStoryId = story.id.value
+                                            }
+                                            .padding(.horizontal, 16)
                                         }
-                                        .padding(.horizontal, 16)
                                     }
+                                    .padding(.vertical, 12)
                                 }
-                                .padding(.vertical, 12)
                             }
                         }
-                    case .history:
-                        if viewModel.historyEntries.isEmpty {
-                            EmptyView(message: localizedString(AppStringKey.libraryEmptySubtitle), iconName: "clock")
-                        } else {
-                            ScrollView {
-                                LazyVStack(spacing: 10) {
-                                    ForEach(viewModel.historyEntries, id: \.story.id.value) { entry in
-                                        StoryRowItem(story: entry.story) {
-                                            selectedStoryId = entry.story.id.value
+                        .tag(LibraryTab.saved)
+
+                        // 2. History Tab
+                        Group {
+                            if viewModel.historyEntries.isEmpty {
+                                EmptyView(message: localizedString(AppStringKey.libraryEmptySubtitle), iconName: "clock")
+                            } else {
+                                ScrollView {
+                                    LazyVStack(spacing: 10) {
+                                        ForEach(viewModel.historyEntries, id: \.story.id.value) { entry in
+                                            StoryRowItem(story: entry.story) {
+                                                selectedStoryId = entry.story.id.value
+                                            }
+                                            .padding(.horizontal, 16)
                                         }
-                                        .padding(.horizontal, 16)
                                     }
+                                    .padding(.vertical, 12)
                                 }
-                                .padding(.vertical, 12)
                             }
                         }
-                    case .downloads:
+                        .tag(LibraryTab.history)
+
+                        // 3. Downloads Tab
                         EmptyView(message: localizedString(AppStringKey.libraryEmptySubtitle), iconName: "arrow.down.circle")
+                            .tag(LibraryTab.downloads)
                     }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
                 }
             }
             .background(themeManager.colors.background)

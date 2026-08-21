@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.slowbuild.storyverse.domain.i18n.AppStringKey
 import com.slowbuild.storyverse.domain.i18n.AppStrings
+import com.slowbuild.storyverse.storyverse.theme.localizedString
 import com.slowbuild.storyverse.storyverse.ui.common.ErrorView
 import com.slowbuild.storyverse.storyverse.ui.common.LoadingView
 import com.slowbuild.storyverse.storyverse.ui.common.StoryVerseTopBar
