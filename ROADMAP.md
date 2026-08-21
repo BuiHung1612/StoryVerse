@@ -35,7 +35,7 @@
 - [x] Phase 4 — StorySource Architecture
 - [x] Phase 5 — Multi-Language & Unified Localization (i18n)
 - [x] Phase 6 — Design System & Multi-Theme Architecture
-- [ ] Phase 7 — First Real Story Source
+- [x] Phase 7 — First Real Story Source
 - [ ] Phase 8 — Room KMP Persistence
 - [ ] Phase 9 — Android Native App Shell
 - [ ] Phase 10 — iOS Native App Shell
@@ -186,17 +186,17 @@
 **Prerequisites:** Phase 6 complete.
 
 **Tasks**
-- [ ] Integrate one actual usable story source (e.g., web or open API).
-- [ ] Implement home lists/rankings/categories where available.
-- [ ] Implement search with pagination.
-- [ ] Fetch and map story metadata/detail.
-- [ ] Fetch chapter list and chapter content.
-- [ ] Handle malformed content, mapping, and rate/network failures.
-- [ ] Write tests and fixtures for the implemented source.
+- [x] Integrate one actual usable story source (e.g., web or open API / Drive Catalog with 10,000+ real EPUB stories).
+- [x] Implement home lists/rankings/categories where available (Featured, Tiên Hiệp & Huyền Huyễn, Đô Thị & Khoa Huyễn, Latest).
+- [x] Implement search with pagination (by title, author, category/subject, and sorting).
+- [x] Fetch and map story metadata/detail (filename parser, author extraction, slug mapping, EPUB downloadUrl/size metadata).
+- [x] Fetch chapter list and chapter content.
+- [x] Handle malformed content, mapping, and rate/network failures.
+- [x] Write tests and fixtures for the implemented source.
 
 **Definition of Done**
-- [ ] End-to-end flow from story source to domain models is working and tested.
-- [ ] Error handling and edge cases are covered.
+- [x] End-to-end flow from story source to domain models is working and tested.
+- [x] Error handling and edge cases are covered.
 
 ---
 

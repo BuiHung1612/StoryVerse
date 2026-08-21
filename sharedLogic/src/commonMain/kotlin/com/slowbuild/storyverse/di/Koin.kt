@@ -5,6 +5,7 @@ import com.slowbuild.storyverse.core.dispatcher.DispatcherProvider
 import com.slowbuild.storyverse.data.i18n.LocalizationRepositoryImpl
 import com.slowbuild.storyverse.data.network.client.HttpClientFactory
 import com.slowbuild.storyverse.data.source.StorySourceRegistryImpl
+import com.slowbuild.storyverse.data.source.catalog.DriveCatalogStorySource
 import com.slowbuild.storyverse.data.source.stub.StubStorySource
 import com.slowbuild.storyverse.data.theme.ThemeRepositoryImpl
 import com.slowbuild.storyverse.domain.i18n.AppStrings
@@ -30,9 +31,13 @@ val domainModule = module {
 
 val dataModule = module {
     single<HttpClient> { HttpClientFactory.create() }
+    single { DriveCatalogStorySource(httpClient = get()) }
     single<StorySourceRegistry> {
         StorySourceRegistryImpl(
-            initialSources = listOf(StubStorySource())
+            initialSources = listOf(
+                get<DriveCatalogStorySource>(),
+                StubStorySource()
+            )
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.slowbuild.storyverse.di
 
 import com.slowbuild.storyverse.core.dispatcher.DispatcherProvider
+import com.slowbuild.storyverse.data.source.catalog.DriveCatalogStorySource
 import com.slowbuild.storyverse.domain.i18n.AppStringKey
 import com.slowbuild.storyverse.domain.i18n.AppStrings
 import com.slowbuild.storyverse.domain.i18n.LocalizationRepository
@@ -40,8 +41,12 @@ class KoinModuleTest : KoinTest {
         val httpClient = get<HttpClient>()
         assertNotNull(httpClient)
 
+        val driveSource = get<DriveCatalogStorySource>()
+        assertNotNull(driveSource)
+
         val registry = get<StorySourceRegistry>()
         assertNotNull(registry)
         assertNotNull(registry.getDefaultSource())
+        assertEquals(2, registry.getAllSources().size)
     }
 }
