@@ -5,6 +5,7 @@ public struct LibraryView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @StateObject private var viewModel = LibraryViewModel()
     @State private var selectedStoryId: String? = nil
+    @Namespace private var tabAnimation
 
     public init() {}
 
@@ -23,11 +24,11 @@ public struct LibraryView: View {
                     }
                 )
 
-                // Tab Selector
+                // Tab Selector with smooth sliding indicator
                 HStack(spacing: 0) {
                     ForEach(LibraryTab.allCases) { tab in
                         Button(action: {
-                            withAnimation(.easeInOut(duration: 0.25)) {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
                                 viewModel.selectedTab = tab
                             }
                         }) {
@@ -36,9 +37,17 @@ public struct LibraryView: View {
                                     .font(.system(size: 14, weight: viewModel.selectedTab == tab ? .bold : .medium))
                                     .foregroundColor(viewModel.selectedTab == tab ? themeManager.colors.primary : themeManager.colors.textSecondary)
 
-                                Rectangle()
-                                    .fill(viewModel.selectedTab == tab ? themeManager.colors.primary : Color.clear)
-                                    .frame(height: 2)
+                                ZStack {
+                                    if viewModel.selectedTab == tab {
+                                        RoundedRectangle(cornerRadius: 1.5)
+                                            .fill(themeManager.colors.primary)
+                                            .frame(height: 3)
+                                            .matchedGeometryEffect(id: "LIBRARY_ACTIVE_TAB_INDICATOR", in: tabAnimation)
+                                    } else {
+                                        Color.clear
+                                            .frame(height: 3)
+                                    }
+                                }
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -51,7 +60,7 @@ public struct LibraryView: View {
                 if viewModel.isLoading && viewModel.savedStories.isEmpty {
                     LoadingView()
                 } else {
-                    TabView(selection: $viewModel.selectedTab) {
+                    TabView(selection: $viewModel.selectedTab.animation(.spring(response: 0.35, dampingFraction: 0.75))) {
                         // 1. Saved Stories Tab
                         Group {
                             if viewModel.savedStories.isEmpty {

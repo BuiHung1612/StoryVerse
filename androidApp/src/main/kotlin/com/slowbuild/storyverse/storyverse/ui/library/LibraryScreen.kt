@@ -46,6 +46,8 @@ import com.slowbuild.storyverse.domain.i18n.AppStrings
 import com.slowbuild.storyverse.domain.model.HistoryEntry
 import com.slowbuild.storyverse.domain.model.Story
 import com.slowbuild.storyverse.storyverse.theme.localizedString
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.TabRowDefaults
@@ -99,16 +101,38 @@ fun LibraryScreen(
             }
         )
 
-        // Tab Row
+        // Tab Row with continuous animated indicator
         TabRow(
             selectedTabIndex = pagerState.currentPage,
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
             indicator = { tabPositions ->
-                if (pagerState.currentPage < tabPositions.size) {
-                    TabRowDefaults.SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                        color = MaterialTheme.colorScheme.primary
+                if (tabPositions.isNotEmpty() && pagerState.currentPage < tabPositions.size) {
+                    val currentPage = pagerState.currentPage
+                    val offsetFraction = pagerState.currentPageOffsetFraction
+                    val targetPage = when {
+                        offsetFraction > 0f -> (currentPage + 1).coerceAtMost(tabPositions.lastIndex)
+                        offsetFraction < 0f -> (currentPage - 1).coerceAtLeast(0)
+                        else -> currentPage
+                    }
+                    val currentTab = tabPositions[currentPage]
+                    val targetTab = tabPositions[targetPage]
+                    val fraction = kotlin.math.abs(offsetFraction)
+
+                    val indicatorLeft = androidx.compose.ui.unit.lerp(currentTab.left, targetTab.left, fraction)
+                    val indicatorWidth = androidx.compose.ui.unit.lerp(currentTab.width, targetTab.width, fraction)
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.BottomStart)
+                            .offset(x = indicatorLeft)
+                            .width(indicatorWidth)
+                            .height(3.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)
+                            )
                     )
                 }
             }
