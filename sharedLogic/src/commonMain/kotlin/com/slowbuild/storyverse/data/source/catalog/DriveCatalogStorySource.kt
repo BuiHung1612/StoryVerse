@@ -6,6 +6,7 @@ import com.slowbuild.storyverse.core.result.AppResult
 import com.slowbuild.storyverse.data.source.RemoteStorySource
 import com.slowbuild.storyverse.domain.model.Chapter
 import com.slowbuild.storyverse.domain.model.ChapterContent
+import com.slowbuild.storyverse.domain.model.Story
 import com.slowbuild.storyverse.domain.model.StoryDetail
 import com.slowbuild.storyverse.domain.model.StoryId
 import com.slowbuild.storyverse.domain.model.StoryOrigin
@@ -45,8 +46,65 @@ class DriveCatalogStorySource(
         )
     )
 
+    private class IndexedCatalog(
+        val rawItems: List<DriveCatalogItemDto>,
+        val domainStories: List<Story>,
+        val searchEntries: List<SearchEntry>,
+        val categoryIndex: Map<String, List<Int>>
+    ) {
+        data class SearchEntry(
+            val index: Int,
+            val lowerSearchBlob: String
+        )
+    }
+
     private val mutex = Mutex()
     private var cachedItems: List<DriveCatalogItemDto>? = preloadedItems
+    private var cachedIndex: IndexedCatalog? = null
+
+    private fun buildIndex(items: List<DriveCatalogItemDto>, sourceId: String): IndexedCatalog {
+        val domainStories = items.map { DriveCatalogMapper.toDomain(it, sourceId) }
+        val searchEntries = items.mapIndexed { index, item ->
+            val blob = "${item.name} ${item.subjects.joinToString(" ")}".lowercase()
+            IndexedCatalog.SearchEntry(index = index, lowerSearchBlob = blob)
+        }
+
+        val categoryMap = mutableMapOf<String, MutableList<Int>>()
+        items.forEachIndexed { index, item ->
+            item.subjects.forEach { subject ->
+                val lowerSub = subject.trim().lowercase()
+                val slug = DriveCatalogMapper.toCategorySlug(subject)
+                if (lowerSub.isNotEmpty()) {
+                    categoryMap.getOrPut(lowerSub) { mutableListOf() }.add(index)
+                }
+                if (slug.isNotEmpty() && slug != lowerSub) {
+                    categoryMap.getOrPut(slug) { mutableListOf() }.add(index)
+                }
+            }
+        }
+
+        return IndexedCatalog(
+            rawItems = items,
+            domainStories = domainStories,
+            searchEntries = searchEntries,
+            categoryIndex = categoryMap
+        )
+    }
+
+    private suspend fun ensureIndexedCatalog(): AppResult<IndexedCatalog> {
+        cachedIndex?.let { return AppResult.Success(it) }
+
+        val loadResult = ensureCatalogLoaded()
+        if (loadResult is AppResult.Error) return loadResult
+
+        val items = (loadResult as AppResult.Success).data
+        return mutex.withLock {
+            cachedIndex?.let { return@withLock AppResult.Success(it) }
+            val index = buildIndex(items, metadata.id)
+            cachedIndex = index
+            AppResult.Success(index)
+        }
+    }
 
     private suspend fun ensureCatalogLoaded(): AppResult<List<DriveCatalogItemDto>> {
         cachedItems?.let { return AppResult.Success(it) }
@@ -82,7 +140,8 @@ class DriveCatalogStorySource(
                 is AppResult.Success -> {
                     val items = fetchResult.data.items
                     cachedItems = items
-                    AppLogger.i("DriveCatalog") { "Successfully loaded ${items.size} stories into catalog" }
+                    cachedIndex = buildIndex(items, metadata.id)
+                    AppLogger.i("DriveCatalog") { "Successfully loaded and indexed ${items.size} stories into catalog" }
                     AppResult.Success(items)
                 }
                 is AppResult.Error -> {
@@ -94,10 +153,11 @@ class DriveCatalogStorySource(
     }
 
     override suspend fun getHomeSections(): AppResult<List<StorySection>> {
-        val loadResult = ensureCatalogLoaded()
+        val loadResult = ensureIndexedCatalog()
         if (loadResult is AppResult.Error) return loadResult
 
-        val items = (loadResult as AppResult.Success).data
+        val catalog = (loadResult as AppResult.Success).data
+        val items = catalog.rawItems
         val sourceId = metadata.id
 
         val tienHiep = items.filter { item ->
@@ -113,7 +173,7 @@ class DriveCatalogStorySource(
                 id = "featured",
                 title = "Truyện Tuyển Chọn",
                 type = SectionType.FEATURED,
-                stories = items.take(10).map { DriveCatalogMapper.toDomain(it, sourceId) },
+                stories = catalog.domainStories.take(10),
                 hasMore = true
             ),
             StorySection(
@@ -134,7 +194,7 @@ class DriveCatalogStorySource(
                 id = "latest",
                 title = "Mới Cập Nhật",
                 type = SectionType.LATEST,
-                stories = items.takeLast(10).reversed().map { DriveCatalogMapper.toDomain(it, sourceId) },
+                stories = catalog.domainStories.takeLast(10).reversed(),
                 hasMore = items.size > 10
             )
         )
@@ -151,54 +211,54 @@ class DriveCatalogStorySource(
     }
 
     override suspend fun search(query: String, page: Int, filter: StoryFilter?): AppResult<StoryPage> {
-        val loadResult = ensureCatalogLoaded()
+        val loadResult = ensureIndexedCatalog()
         if (loadResult is AppResult.Error) return loadResult
 
-        val allItems = (loadResult as AppResult.Success).data
+        val catalog = (loadResult as AppResult.Success).data
         val trimmedQuery = query.trim().lowercase()
 
-        var filtered = allItems.filter { item ->
-            val matchesQuery = if (trimmedQuery.isEmpty()) {
-                true
-            } else {
-                item.name.lowercase().contains(trimmedQuery) ||
-                        item.subjects.any { it.lowercase().contains(trimmedQuery) }
-            }
-
-            val matchesCategory = if (filter?.category != null && filter.category.isNotBlank()) {
-                val catQuery = filter.category.lowercase()
-                item.subjects.any { subject ->
-                    subject.lowercase() == catQuery ||
-                            DriveCatalogMapper.toCategorySlug(subject) == catQuery
-                }
-            } else {
-                true
-            }
-
-            matchesQuery && matchesCategory
+        // 1. Filter by category in O(1) via inverted index
+        val candidateIndices: List<Int> = if (filter?.category != null && filter.category.isNotBlank()) {
+            val catQuery = filter.category.trim().lowercase()
+            val slug = DriveCatalogMapper.toCategorySlug(filter.category)
+            catalog.categoryIndex[catQuery]
+                ?: catalog.categoryIndex[slug]
+                ?: catalog.categoryIndex.entries.firstOrNull { it.key.contains(catQuery) || catQuery.contains(it.key) }?.value
+                ?: emptyList()
+        } else {
+            catalog.searchEntries.map { it.index }
         }
 
-        // Sorting
-        filtered = when (filter?.sort) {
-            StorySort.LATEST -> filtered.reversed()
-            StorySort.ALPHABETICAL -> filtered.sortedBy { it.name }
-            else -> filtered
+        // 2. Filter by search query keywords
+        val matchedIndices = if (trimmedQuery.isNotEmpty()) {
+            candidateIndices.filter { idx ->
+                catalog.searchEntries[idx].lowerSearchBlob.contains(trimmedQuery)
+            }
+        } else {
+            candidateIndices
+        }
+
+        // 3. Sorting
+        val sortedIndices = when (filter?.sort) {
+            StorySort.LATEST -> matchedIndices.reversed()
+            StorySort.ALPHABETICAL -> matchedIndices.sortedBy { catalog.domainStories[it].title }
+            else -> matchedIndices
         }
 
         val pageSize = 20
         val startIndex = ((page - 1) * pageSize).coerceAtLeast(0)
-        val pagedItems = filtered.drop(startIndex).take(pageSize)
-        val hasNext = startIndex + pageSize < filtered.size
+        val pagedIndices = sortedIndices.drop(startIndex).take(pageSize)
+        val hasNext = startIndex + pageSize < sortedIndices.size
 
-        val domainStories = pagedItems.map { DriveCatalogMapper.toDomain(it, metadata.id) }
+        val pagedStories = pagedIndices.map { catalog.domainStories[it] }
 
         return AppResult.Success(
             StoryPage(
-                stories = domainStories,
+                stories = pagedStories,
                 page = page,
                 hasNextPage = hasNext,
-                totalPages = (filtered.size + pageSize - 1) / pageSize,
-                totalResults = filtered.size
+                totalPages = (sortedIndices.size + pageSize - 1) / pageSize,
+                totalResults = sortedIndices.size
             )
         )
     }

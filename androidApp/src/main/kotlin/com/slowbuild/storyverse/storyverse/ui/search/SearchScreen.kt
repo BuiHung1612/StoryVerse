@@ -41,6 +41,12 @@ import com.slowbuild.storyverse.storyverse.ui.common.StoryRowItem
 import com.slowbuild.storyverse.storyverse.ui.common.StoryVerseTopBar
 import org.koin.androidx.compose.koinViewModel
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+
 @Composable
 fun SearchScreen(
     onStoryClick: (Story) -> Unit,
@@ -132,13 +138,13 @@ fun SearchScreen(
             uiState.hasSearched && uiState.searchResults.isEmpty() -> {
                 EmptyView(
                     title = localizedString(AppStringKey.SEARCH_NO_RESULTS),
-                    message = "Thử tìm kiếm với từ khóa khác"
+                    message = localizedString(AppStringKey.SEARCH_HINT)
                 )
             }
             !uiState.hasSearched -> {
                 EmptyView(
                     title = localizedString(AppStringKey.TAB_SEARCH),
-                    message = "Nhập tên truyện, tác giả hoặc thể loại để tìm kiếm"
+                    message = localizedString(AppStringKey.SEARCH_HINT)
                 )
             }
             else -> {
@@ -152,6 +158,26 @@ fun SearchScreen(
                             story = story,
                             onClick = { onStoryClick(story) }
                         )
+                    }
+
+                    if (uiState.hasNextPage) {
+                        item {
+                            LaunchedEffect(Unit) {
+                                viewModel.loadNextPage()
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
                     }
                 }
             }

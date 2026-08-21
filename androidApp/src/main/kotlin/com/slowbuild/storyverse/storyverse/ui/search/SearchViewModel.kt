@@ -17,10 +17,13 @@ import kotlinx.coroutines.launch
 data class SearchUiState(
     val query: String = "",
     val isLoading: Boolean = false,
+    val isLoadingMore: Boolean = false,
     val searchResults: List<Story> = emptyList(),
     val availableCategories: List<String> = listOf("Tiên Hiệp", "Kiếm Hiệp", "Huyền Huyễn", "Đô Thị", "Khoa Huyễn", "Lịch Sử", "Võng Du"),
     val selectedCategory: String? = null,
     val hasSearched: Boolean = false,
+    val currentPage: Int = 1,
+    val hasNextPage: Boolean = false,
     val errorMessage: String? = null
 )
 
@@ -38,7 +41,7 @@ class SearchViewModel(
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(300) // Debounce
-            executeSearch(query = newQuery, category = _uiState.value.selectedCategory)
+            executeSearch(query = newQuery, category = _uiState.value.selectedCategory, page = 1)
         }
     }
 
@@ -47,33 +50,76 @@ class SearchViewModel(
         _uiState.update { it.copy(selectedCategory = nextCategory) }
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            executeSearch(query = _uiState.value.query, category = nextCategory)
+            executeSearch(query = _uiState.value.query, category = nextCategory, page = 1)
         }
     }
 
-    private suspend fun executeSearch(query: String, category: String?) {
+    fun loadNextPage() {
+        val state = _uiState.value
+        if (state.isLoading || state.isLoadingMore || !state.hasNextPage) return
+
+        viewModelScope.launch {
+            val nextPage = state.currentPage + 1
+            _uiState.update { it.copy(isLoadingMore = true) }
+            val source = storySourceRegistry.getDefaultSource() ?: return@launch
+
+            val filter = if (state.selectedCategory != null) StoryFilter(category = state.selectedCategory) else null
+            when (val result = source.search(query = state.query, page = nextPage, filter = filter)) {
+                is AppResult.Success -> {
+                    val pageData = result.data
+                    _uiState.update {
+                        it.copy(
+                            isLoadingMore = false,
+                            currentPage = nextPage,
+                            hasNextPage = pageData.hasNextPage,
+                            searchResults = it.searchResults + pageData.stories
+                        )
+                    }
+                }
+                is AppResult.Error -> {
+                    _uiState.update { it.copy(isLoadingMore = false) }
+                }
+            }
+        }
+    }
+
+    private suspend fun executeSearch(query: String, category: String?, page: Int = 1) {
         if (query.isBlank() && category == null) {
             _uiState.update {
                 it.copy(
                     isLoading = false,
+                    isLoadingMore = false,
                     searchResults = emptyList(),
                     hasSearched = false,
+                    currentPage = 1,
+                    hasNextPage = false,
                     errorMessage = null
                 )
             }
             return
         }
 
-        _uiState.update { it.copy(isLoading = true, hasSearched = true, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                isLoadingMore = false,
+                hasSearched = true,
+                currentPage = page,
+                errorMessage = null
+            )
+        }
         val source = storySourceRegistry.getDefaultSource() ?: return
 
         val filter = if (category != null) StoryFilter(category = category) else null
-        when (val result = source.search(query = query, page = 1, filter = filter)) {
+        when (val result = source.search(query = query, page = page, filter = filter)) {
             is AppResult.Success -> {
+                val pageData = result.data
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        searchResults = result.data.stories,
+                        searchResults = pageData.stories,
+                        currentPage = page,
+                        hasNextPage = pageData.hasNextPage,
                         errorMessage = null
                     )
                 }
